@@ -1,0 +1,4 @@
+"  Kingdom"	"   Phylum"	"   Class"	"   Order"	"   Family"	"   Genus"	"  Species"
+""	"Length:6083       "	"Length:6083       "	"Length:6083       "	"Length:6083       "	"Length:6083       "	"Length:6083       "	"Length:6083       "
+""	"Class :character  "	"Class :character  "	"Class :character  "	"Class :character  "	"Class :character  "	"Class :character  "	"Class :character  "
+""	"Mode  :character  "	"Mode  :character  "	"Mode  :character  "	"Mode  :character  "	"Mode  :character  "	"Mode  :character  "	"Mode  :character  "

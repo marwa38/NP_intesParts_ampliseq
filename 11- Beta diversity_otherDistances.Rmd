@@ -1,0 +1,1114 @@
+---
+title: "<center> Nutritional Programming paper across gut regions in context of intestinal microbiome <center>"
+author: "<center> Marwa Tawfik <center><br>"
+date: "<center> _`r Sys.Date()`_ <center>"
+output:
+  html_document:
+    code_folding: show
+    df_print: paged
+    theme: yeti
+    highlight: tango
+    toc: yes
+    toc_float:
+      collapsed: false
+      smooth_scroll: false
+    number_sections: true
+  pdf_document:
+    fig_caption: yes
+    toc: yes
+---
+
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+##Load the required package. Some of these package are not needed here, but are loaded from the previous steps 
+library(Rcpp)
+library(dada2)
+library(phyloseq)
+library(permute)
+library(lattice)
+library(vegan)
+library(ggplot2)
+library(tidyverse)
+library(ggstatsplot)
+library(dplyr)
+library(microbiome)
+library(microbiomeutilities)
+library(knitr)
+library(RColorBrewer)
+library(DT)
+library(cowplot)
+library(ranacapa)
+library(ape)
+library(plotly)
+library(cluster)
+library(pairwiseAdonis)
+library(ggpubr)
+library(gt)
+library(PerformanceAnalytics)
+# the following needs a higher versino of R to run only function philr
+library(philr)
+library(venn)
+library(MicrobeR)
+```
+
+
+
+```{r}
+## Read the phyloseq object 
+ps.prev <- readRDS("phyobjects/STEP 15/ps.prev.f.rds") # without tree 
+ps.prev.tree <- readRDS( "phyobjects/STEP 16/ps.prev.rooted.rds") # have tree 
+ps.prev.intes <- readRDS("phyobjects/STEP 15/ps.prev.intes.f.refseq.rds") # without tree 
+ps.prev.intes.tree <- readRDS( "phyobjects/STEP 16/ps.prev.intes.rooted.rds") # have tree 
+```
+
+
+```{r}
+## rarefraction based on Q1 sequence size in the sample
+summary(sample_sums(ps.prev)) # Q1 2137
+summary(sample_sums(ps.prev.tree)) # Q1 2137
+  # Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  #   624    2137    7577   35493   48540  279216 
+  #  Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  #   624    2137    7577   35493   48540  279216 
+ps.prev.rare <- rarefy_even_depth(ps.prev, sample.size = 2137, rngseed = 50)
+ps.prev.tree.rare <- rarefy_even_depth(ps.prev.tree, sample.size = 2137, rngseed = 50)
+# `set.seed(50)` was used to initialize repeatable random subsampling.
+# Please record this for your records so others can reproduce.
+# Try `set.seed(50); .Random.seed` for the full vector
+# ...
+# 26 samples removedbecause they contained fewer reads than `sample.size`.
+# Up to first five removed samples are: 
+# 
+# distal-MMV-T1-Rep4distal-MMV-T9-Rep1distal-MMV-T9-Rep2distal-VMV-T12-Rep5distal-VMV-T3-Rep2
+# ...
+# 1630OTUs were removed because they are no longer 
+# present in any sample after random subsampling
+# 
+# ...
+# `set.seed(50)` was used to initialize repeatable random subsampling.
+# Please record this for your records so others can reproduce.
+# Try `set.seed(50); .Random.seed` for the full vector
+# ...
+# 26 samples removedbecause they contained fewer reads than `sample.size`.
+# Up to first five removed samples are: 
+# 
+# distal-MMV-T1-Rep4distal-MMV-T9-Rep1distal-MMV-T9-Rep2distal-VMV-T12-Rep5distal-VMV-T3-Rep2
+#1713OTUs were removed because they are no longer 
+#present in any sample after random subsampling
+
+## gut only 
+summary(sample_sums(ps.prev.intes)) # Q1 1838
+summary(sample_sums(ps.prev.intes.tree)) # Q1 1838
+  # Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  #   624    1838    4944   30059   25594  279216 
+  #  Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  #   624    1838    4944   30059   25594  279216 
+ps.prev.intes.rare <- rarefy_even_depth(ps.prev.intes, sample.size = 1838, rngseed = 50)
+ps.prev.intes.tree.rare <- rarefy_even_depth(ps.prev.intes.tree, sample.size = 1838, rngseed = 50)
+# `set.seed(50)` was used to initialize repeatable random subsampling.
+# Please record this for your records so others can reproduce.
+# Try `set.seed(50); .Random.seed` for the full vector
+# ...
+# 23 samples removedbecause they contained fewer reads than `sample.size`.
+# Up to first five removed samples are: 
+# 
+# distal-MMV-T1-Rep4distal-MMV-T9-Rep1distal-MMV-T9-Rep2distal-VMV-T12-Rep5distal-VMV-T3-Rep2
+# ...
+# 590OTUs were removed because they are no longer 
+# present in any sample after random subsampling
+# 
+# ...
+# `set.seed(50)` was used to initialize repeatable random subsampling.
+# Please record this for your records so others can reproduce.
+# Try `set.seed(50); .Random.seed` for the full vector
+# ...
+# 23 samples removedbecause they contained fewer reads than `sample.size`.
+# Up to first five removed samples are: 
+# 
+# distal-MMV-T1-Rep4distal-MMV-T9-Rep1distal-MMV-T9-Rep2distal-VMV-T12-Rep5distal-VMV-T3-Rep2
+#583OTUs were removed because they are no longer 
+#present in any sample after random subsampling
+```
+
+##Beta diversity - Unweighted unifrac distance and jaccard distance with rarefied phyloseq object
+```{r}
+ # PCoA plot using the unweighted UniFrac as distance
+wunifrac_dist = phyloseq::distance(ps.prev.tree.rare, method="unifrac", weighted=F)
+ord_unwuf = ordinate(ps.prev.tree.rare, method="PCoA", distance=wunifrac_dist)
+metadata <- data.frame(sample_data(ps.prev.tree.rare), check.names = FALSE)
+
+# Warning message:
+# In matrix(tree$edge[order(tree$edge[, 1]), ][, 2], byrow = TRUE,  :
+#   data length [3753] is not a sub-multiple or multiple of the number of rows [1877]
+#   
+# length(wunifrac_dist)
+# str(ps.prev.tree.rare)
+# str(phy_tree(ps.prev.tree.rare))
+
+## gut
+wunifrac_dist.intes = phyloseq::distance(ps.prev.intes.tree.rare, method="unifrac", weighted=F)
+ord_unwuf.intes = ordinate(ps.prev.intes.tree.rare, method="PCoA", distance=wunifrac_dist.intes)
+metadata.intes <- data.frame(sample_data(ps.prev.intes.tree.rare), check.names = FALSE)
+```
+
+##Plotting the PCOA for unweighted unifrac (2D plot)
+```{r pcoa_uwuf_2d}
+pco_uwuf <- as.data.frame(ord_unwuf$vectors) %>%
+  rownames_to_column("rownames") %>%
+  full_join(., rownames_to_column(metadata, "rownames"), by = "rownames") 
+labs_uwuf <- paste0("PCo", 1:length(ord_unwuf$values$Eigenvalues), ": ", 
+                     round((100*ord_unwuf$values$Eigenvalues/sum(ord_unwuf$values$Eigenvalues)),1), "%")
+p_uwuf <- ggplot(pco_uwuf, aes(x = Axis.1, y = Axis.2, color = Region_Regime)) +
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) +
+  geom_point(size = 4) +
+  labs(title = "PCoA of Unweighted unifrac", color = "Region_Regime",
+       x = labs_uwuf[1],
+       y = labs_uwuf[2]) +
+  scale_color_manual(values = brewer.pal(n = 10, name = "Paired")[c(5,6,1,2,3,4,9,10,8,7)]) +
+  theme_cowplot() +
+  panel_border(colour = "black") 
+p_uwuf
+ggsave("figures/p_uwuf.tiff", width = 10, height = 6,
+       units = "in", dpi = 300, compression = "lzw")
+
+# gut 
+pco_uwuf.intes <- as.data.frame(ord_unwuf.intes$vectors) %>%
+  rownames_to_column("rownames") %>%
+  full_join(., rownames_to_column(metadata.intes, "rownames"), by = "rownames") 
+labs_uwuf.intes <- paste0("PCo", 1:length(ord_unwuf.intes$values$Eigenvalues), ": ", 
+                    round((100*ord_unwuf.intes$values$Eigenvalues/sum(ord_unwuf.intes$values$Eigenvalues)),1), "%")
+p_uwuf.intes <- ggplot(pco_uwuf.intes, aes(x = Axis.1, y = Axis.2, color = Region_Regime)) +
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) +
+  geom_point(size = 4) +
+  labs(title = "PCoA of Unweighted unifrac", color = "Region_Regime",
+       x = labs_uwuf.intes[1],
+       y = labs_uwuf.intes[2]) +
+  scale_color_manual(values = brewer.pal(n = 10, name = "Paired")[c(5,6,1,2,3,4,9,10,8,7)]) +
+  theme_cowplot() +
+  panel_border(colour = "black") 
+p_uwuf.intes
+ggsave("figures/p_uwuf.intes.tiff", width = 10, height = 6,
+       units = "in", dpi = 300, compression = "lzw")
+```
+
+##Plotting the PCOA for unweighted unifrac (interactive 3D plot)
+```{r}
+plot_ly(x = pco_uwuf[,"Axis.1"], y = pco_uwuf[,"Axis.2"], z = pco_uwuf[,"Axis.3"], 
+        type = "scatter3d", mode = "markers", color = metadata$Region_Regime, 
+        colors = brewer.pal(n = 10, name = "Paired")[c(5,6,1,2,3,4,9,10,8,7)]) %>%
+        layout(scene = list(xaxis = list(title = labs_uwuf[1]),
+                            yaxis = list(title = labs_uwuf[2]),
+                            zaxis = list(title = labs_uwuf[3])
+                        ))
+
+# gut
+plot_ly(x = pco_uwuf.intes[,"Axis.1"], y = pco_uwuf.intes[,"Axis.2"], z = pco_uwuf.intes[,"Axis.3"], 
+        type = "scatter3d", mode = "markers", color = metadata.intes$Region_Regime, 
+        colors = brewer.pal(n = 6, name = "Paired")[c(5,6,1,2,3,4)]) %>%
+  layout(scene = list(xaxis = list(title = labs_uwuf.intes[1]),
+                      yaxis = list(title = labs_uwuf.intes[2]),
+                      zaxis = list(title = labs_uwuf.intes[3])
+  ))
+```
+
+
+##PCOA using the jaccard as distance
+```{r}
+jacc_dist <- phyloseq::distance(ps.prev.tree.rare, method = "jaccard", binary = TRUE)
+ord_jac = ordinate(ps.prev.tree.rare, method="PCoA", distance=jacc_dist)
+
+# gut 
+jacc_dist.intes <- phyloseq::distance(ps.prev.intes.tree.rare, method = "jaccard", binary = TRUE)
+ord_jac.intes = ordinate(ps.prev.intes.tree.rare, method="PCoA", distance=jacc_dist.intes)
+```
+
+##Plotting the PCOA for jaccard distance (2D plot)
+```{r}
+pco_jac <- as.data.frame(ord_jac$vectors) %>%
+  rownames_to_column("rownames") %>%
+  full_join(., rownames_to_column(metadata, "rownames"), by = "rownames") 
+labs_jac <- paste0("PCo", 1:length(ord_jac$values$Eigenvalues), ": ", 
+                     round((100*ord_jac$values$Eigenvalues/sum(ord_jac$values$Eigenvalues)),1), "%")
+p_jac <- ggplot(pco_jac, aes(x = Axis.1, y = Axis.2, color = Region_Regime)) +
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) +
+  geom_point(size = 4) +
+  labs(title = "PCoA of jaccard distance", color = "Region_Regime",
+       x = labs_uwuf[1],
+       y = labs_uwuf[2]) +
+  scale_color_manual(values = brewer.pal(n = 10, name = "Paired")[c(5,6,1,2,3,4,9,10,8,7)]) +
+  theme_cowplot() +
+  panel_border(colour = "black") 
+p_jac
+ggsave("figures/p_jac.tiff", width = 10, height = 6,
+       units = "in", dpi = 300, compression = "lzw")
+
+# gut 
+pco_jac.intes <- as.data.frame(ord_jac.intes$vectors) %>%
+  rownames_to_column("rownames") %>%
+  full_join(., rownames_to_column(metadata.intes, "rownames"), by = "rownames") 
+labs_jac.intes <- paste0("PCo", 1:length(ord_jac.intes$values$Eigenvalues), ": ", 
+                   round((100*ord_jac.intes$values$Eigenvalues/sum(ord_jac.intes$values$Eigenvalues)),1), "%")
+p_jac.intes <- ggplot(pco_jac.intes, aes(x = Axis.1, y = Axis.2, color = Region_Regime)) +
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) +
+  geom_point(size = 4) +
+  labs(title = "PCoA of jaccard distance", color = "Region_Regime",
+       x = labs_uwuf[1],
+       y = labs_uwuf[2]) +
+  scale_color_manual(values = brewer.pal(n = 10, name = "Paired")[c(5,6,1,2,3,4,9,10,8,7)]) +
+  theme_cowplot() +
+  panel_border(colour = "black") 
+p_jac.intes
+ggsave("figures/p_jac.intes.tiff", width = 10, height = 6,
+       units = "in", dpi = 300, compression = "lzw")
+```
+
+
+##Plotting the PCOA for jaccard distance (interactive 3D plot)
+```{r}
+plot_ly(x = pco_jac[,"Axis.1"], y = pco_jac[,"Axis.2"], z = pco_jac[,"Axis.3"], 
+        type = "scatter3d", mode = "markers", color = metadata$Region_Regime, 
+        colors = brewer.pal(n = 10, name = "Paired")[c(5,6,1,2,3,4,9,10,8,7)]) %>%
+        layout(scene = list(xaxis = list(title = labs_uwuf[1]),
+                            yaxis = list(title = labs_uwuf[2]),
+                            zaxis = list(title = labs_uwuf[3])
+                        ))
+
+plot_ly(x = pco_jac.intes[,"Axis.1"], y = pco_jac.intes[,"Axis.2"], z = pco_jac.intes[,"Axis.3"], 
+        type = "scatter3d", mode = "markers", color = metadata.intes$Region_Regime, 
+        colors = brewer.pal(n = 6, name = "Paired")[c(5,6,1,2,3,4)]) %>%
+  layout(scene = list(xaxis = list(title = labs_uwuf.intes[1]),
+                      yaxis = list(title = labs_uwuf.intes[2]),
+                      zaxis = list(title = labs_uwuf.intes[3])
+  ))
+```
+
+
+####Beta diversity - Robust Aitchison PCA and Phylogenetic Isometric Log-Ratio Transform (PHLR) on full phyloseq object 
+
+#### Roboust Aitchison PCA
+
+##Note that RPCA is not exactly performing PCA. It is performing PCoA using the Aitchison distance, which is calculated from the Euclidean distance of the clr-transformed data. Since PCoA with Euclidean distance is equivalent to PCA, the method is called PCA though it's in fact running PCoA.
+
+
+##centered log-ratio transformation of phyloseq object and extraction of principal componenents and variance explained for plotting
+```{r}
+ps_clr <- microbiome::transform(ps.prev.tree, "clr") 
+#check the original phyloseq ps.prev.tree
+phyloseq::otu_table(ps.prev.tree)[10:20, 10:20]
+#check the clr transformed object
+phyloseq::otu_table(ps_clr)[10:20, 10:20]
+#PCA via phyloseq
+ord_clr <- phyloseq::ordinate(ps_clr, "RDA")
+metadata <- data.frame(sample_data(ps.prev.tree), check.names = FALSE)
+
+ps_clr.intes <- microbiome::transform(ps.prev.intes.tree, "clr") 
+#check the original phyloseq ps.prev.intes.tree
+phyloseq::otu_table(ps.prev.intes.tree)[10:20, 10:20]
+#check the clr transformed object
+phyloseq::otu_table(ps_clr.intes)[10:20, 10:20]
+#PCA via phyloseq
+ord_clr.intes <- phyloseq::ordinate(ps_clr.intes, "RDA")
+metadata.intes <- data.frame(sample_data(ps.prev.intes.tree), check.names = FALSE)
+```
+
+##Plotting the PCOA for Roboust Aitchison PCA (2D plot)
+```{r}
+pco_aitchison <- as.data.frame(ord_clr$CA$u) %>%
+  rownames_to_column("rownames") %>%
+  full_join(., rownames_to_column(metadata, "rownames"), by = "rownames") 
+labs_aitchison <- paste0("PCo", 1:length(ord_clr$CA$eig), ": ", 
+                     round((100*ord_clr$CA$eig/sum(ord_clr$CA$eig)),1), "%")
+p_aitchison <- ggplot(pco_aitchison, aes(x = PC1, y = PC2, color = Region_Regime)) +
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) +
+  geom_point(size = 4) +
+  labs(title = "PCoA of Roboust Aitchison", color = "Region_Regime",
+       x = labs_aitchison[1],
+       y = labs_aitchison[2]) +
+  scale_color_manual(values = brewer.pal(n = 10, name = "Paired")[c(5,6,1,2,3,4,9,10,8,7)]) +
+  theme_cowplot() +
+  panel_border(colour = "black") 
+p_aitchison
+
+ggsave("figures/p_aitchison.tiff", width = 10, height = 6,
+       units = "in", dpi = 300, compression = "lzw")
+
+# seperate intesFeedWtr (grouped and colored by sample)
+pco_aitchison2 <- as.data.frame(ord_clr$CA$u) %>%
+  rownames_to_column("rownames") %>%
+  full_join(., rownames_to_column(metadata, "rownames"), by = "rownames") 
+labs_aitchison2 <- paste0("PCo", 1:length(ord_clr$CA$eig), ": ", 
+                     round((100*ord_clr$CA$eig/sum(ord_clr$CA$eig)),1), "%")
+p_aitchison2 <- ggplot(pco_aitchison2, aes(x = PC1, y = PC2, color = sample)) +
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) +
+  geom_point(size = 4) +
+  labs(title = "PCoA of Roboust Aitchison", color = "sample",
+       x = labs_aitchison[1],
+       y = labs_aitchison[2]) +
+  #scale_color_manual(values = brewer.pal(n = 10, name = "Paired")[c(5,6,1,2,3,4,9,10,8,7)]) +
+  theme_cowplot() +
+  panel_border(colour = "black") 
+p_aitchison2
+
+ggsave("figures/p_aitchison2.tiff", width = 5, height = 4,
+       units = "in", dpi = 300, compression = "lzw")
+
+# gut 
+pco_aitchison.intes <- as.data.frame(ord_clr.intes$CA$u) %>%
+  rownames_to_column("rownames") %>%
+  full_join(., rownames_to_column(metadata.intes, "rownames"), by = "rownames") 
+labs_aitchison.intes <- paste0("PCo", 1:length(ord_clr.intes$CA$eig), ": ", 
+                         round((100*ord_clr.intes$CA$eig/sum(ord_clr.intes$CA$eig)),1), "%")
+p_aitchison.intes <- ggplot(pco_aitchison.intes, aes(x = PC1, y = PC2, color = Region_Regime)) +
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) +
+  geom_point(size = 4) +
+  labs(title = "PCoA of Roboust Aitchison", color = "Region_Regime",
+       x = labs_aitchison.intes[1],
+       y = labs_aitchison.intes[2]) +
+  scale_color_manual(values = brewer.pal(n = 6, name = "Paired")[c(5,6,1,2,3,4)]) +
+  theme_cowplot() +
+  panel_border(colour = "black") 
+p_aitchison.intes
+
+ggsave("figures/p_aitchison.intes.tiff", width = 10, height = 6,
+       units = "in", dpi = 300, compression = "lzw")
+```
+
+
+##Plotting the PCOA for Roboust Aitchison (interactive 3D plot)
+```{r}
+plot_ly(x = pco_aitchison[,"PC1"], y = pco_aitchison[,"PC2"], z = pco_aitchison[,"PC3"], 
+        type = "scatter3d", mode = "markers", color = metadata$Region_Regime, 
+        colors = brewer.pal(n = 10, name = "Paired")[c(5,6,1,2,3,4,9,10,8,7)]) %>%
+        layout(scene = list(xaxis = list(title = labs_aitchison[1]),
+                            yaxis = list(title = labs_aitchison[2]),
+                            zaxis = list(title = labs_aitchison[3])
+                        ))
+
+plot_ly(x = pco_aitchison.intes[,"PC1"], y = pco_aitchison.intes[,"PC2"], z = pco_aitchison.intes[,"PC3"], 
+        type = "scatter3d", mode = "markers", color = metadata.intes$Region_Regime, 
+        colors = brewer.pal(n = 6, name = "Paired")[c(5,6,1,2,3,4)]) %>%
+  layout(scene = list(xaxis = list(title = labs_aitchison.intes[1]),
+                      yaxis = list(title = labs_aitchison.intes[2]),
+                      zaxis = list(title = labs_aitchison.intes[3])
+  ))
+```
+
+
+# PCoA of Euclidean distance calculated on PhILR transformed data
+
+### Filter and transform the feature table
+##In the original paper and *PhILR* pakcage tutorial, taxa that were not seen with more than 3 counts in at least 20% of samples or with a coefficient of variation = 3 were filtered. For the present data set, we'll not do data filtering as it results in great loss of data. We'll just add a pseudocount of 1 to the feature table to avoid calculating log-ratios involving zeros. 
+
+
+##PhILR transformation of phyloseq object
+```{r transform_phyloseq, message=FALSE, warning=FALSE}
+#pseq <- filter_taxa(pseq, function(x) sum(x > 3) > (0.2 * length(x)), TRUE)
+#pseq <- filter_taxa(phyloseq, function(x) sd(x)/mean(x) > 3.0, TRUE)
+pseq_t <- transform_sample_counts(ps.prev.tree, function(x) x + 1)
+
+# gut
+pseq_t.intes <- transform_sample_counts(ps.prev.intes.tree, function(x) x + 1)
+```
+
+### Process phylogenetic tree
+##Next we check that the tree is rooted and binary (all multichotomies have been resolved). 
+```{r check_tree, message=FALSE, warning=FALSE}
+is.rooted(phy_tree(pseq_t)) # Is the tree Rooted?
+is.binary.tree(phy_tree(pseq_t)) # All multichotomies resolved?
+
+# gut 
+is.rooted(phy_tree(pseq_t.intes)) # Is the tree Rooted?
+is.binary.tree(phy_tree(pseq_t.intes)) # All multichotomies resolved?
+```
+
+##As the tree is not binary, we use the function `multi2di` from the `ape` package to replace multichotomies with a series of dichotomies with one (or several) branch(es) of zero length. 
+##Since our tree was binary from above, we can omit this step I think. Otherwise do this step
+
+```{r make_binary_tree, message=FALSE, warning=FALSE}
+phy_tree(ps.prev.tree.rare) <- multi2di(phy_tree(ps.prev.tree.rare)) 
+is.binary.tree(phy_tree(ps.prev.tree.rare)) 
+
+# gut 
+phy_tree(ps.prev.intes.tree.rare) <- multi2di(phy_tree(ps.prev.intes.tree.rare)) 
+is.binary.tree(phy_tree(ps.prev.intes.tree.rare)) 
+```
+
+##Now we name the internal nodes of the tree so they are easier to work with. We prefix the node number with `n` and thus the root is named `n1`. 
+
+```{r add_prefix, message=FALSE, warning=FALSE}
+phy_tree(pseq_t) <- makeNodeLabel(phy_tree(pseq_t), method = "number", prefix = 'n')
+
+# gut 
+phy_tree(pseq_t.intes) <- makeNodeLabel(phy_tree(pseq_t.intes), method = "number", prefix = 'n')
+```
+
+##We note that the tree is already rooted with Bacteria as the outgroup and no multichotomies are present. This uses the function `name.balance` from the `philr` package. This function uses a simple voting scheme to find a consensus naming for the two clades that descend from a given balance. Specifically for a balance named `x/y`, `x` refers to the consensus name of the clade in the numerator of the log-ratio and `y` refers to the denominator. 
+```{r check_branch_name}
+name.balance(phy_tree(pseq_t), tax_table(pseq_t), 'n1')
+name.balance(phy_tree(pseq_t), tax_table(pseq_t), 'n10')
+
+# gut
+name.balance(phy_tree(pseq_t.intes), tax_table(pseq_t.intes), 'n1')
+name.balance(phy_tree(pseq_t.intes), tax_table(pseq_t.intes), 'n10')
+```
+
+### Investigate dataset components
+##Finally we transpose the ASV table (`philr` uses the conventions of the `compositions` package for compositional data analysis in R, taxa are columns, samples/compositional data are rows). Then we will take a look at part of the dataset in more detail.
+## We didnt transpose the ASV table here because the taxa are columns, samples/compositional data are rows). if the opposite, you should transpose the table by using t((otu_table(pseq_t)))
+```{r check_objects}
+table_philr <- as.matrix(otu_table(pseq_t))
+table_philr[1:2,1:2] 
+tree <- phy_tree(pseq_t)
+tree
+# OTU Table:          [2 taxa and 2 samples]
+#                      taxa are columns
+#                    ASV678 ASV4795
+# distal-MMV-T1-Rep1      1       1
+# distal-MMV-T1-Rep2      1       1
+# 
+# Phylogenetic tree with 3605 tips and 3566 internal nodes.
+# 
+# Tip labels:
+#   ASV678, ASV4795, ASV1091, ASV1545, ASV4249, ASV688, ...
+# Node labels:
+#   n1, n2, n3, n4, n5, n6, ...
+# 
+# Rooted; includes branch lengths.
+```
+
+```{r check_objects_intes}
+table_philr.intes <- as.matrix(otu_table(pseq_t.intes))
+table_philr.intes[1:2,1:2] 
+tree.intes <- phy_tree(pseq_t.intes)
+tree.intes
+
+# OTU Table:          [2 taxa and 2 samples]
+#                      taxa are columns
+#                    ASV4322 ASV4338
+# distal-MMV-T1-Rep1       1       1
+# distal-MMV-T1-Rep2       1       1
+# 
+# Phylogenetic tree with 1544 tips and 1532 internal nodes.
+# 
+# Tip labels:
+#   ASV4322, ASV4338, ASV5963, ASV4369, ASV564, ASV1185, ...
+# Node labels:
+#   n1, n2, n3, n4, n5, n6, ...
+# 
+# Rooted; includes branch lengths.
+```
+
+### Transform data using PhILR
+##The function `philr::philr()` implements a user friendly wrapper for the key steps in the philr transform. 
+
+##Note: The preprocessed ASV table should be passed to the function `philr::philr()` before it is closed (normalized) to relative abundances, as some of the preset weightings of the taxa use the original count data to down weight low abundance taxa. 
+
+##Here we will use the same weightings as used in the original paper.
+
+```{r add_weightings}
+philr <- philr(table_philr, tree, part.weights = 'enorm.x.gm.counts', ilr.weights = 'blw.sqrt')
+philr[1:5,1:5]
+saveRDS(philr, "Robjects/philr.rds")
+
+# gut 
+philr.intes <- philr(table_philr.intes, tree.intes, part.weights = 'enorm.x.gm.counts', ilr.weights = 'blw.sqrt')
+philr.intes[1:5,1:5]
+saveRDS(philr.intes, "Robjects/philr.intes.rds")
+```
+
+##Now the transformed data is represented in terms of balances and since each balance is associated with a single internal node of the tree, we denote the balances using the same names we assigned to the internal nodes (e.g., `n1`). 
+
+### Ordination in PhILR space
+##Euclidean distance in PhILR space can be used for ordination analysis. First we compute the Euclidean distance and run PCoA using the `ordinate()` function from the *phyloseq* package.
+```{r compute_pcoa_philr}
+# Compute Euclidean distance on PhILR transformed data
+dist_philr <- dist(philr, method = "euclidean")
+# Ordination by PCoA
+ord_philr <- ordinate(pseq_t, 'PCoA', distance = dist_philr)
+
+# gut 
+# Compute Euclidean distance on philr.intes transformed data
+dist_philr.intes <- dist(philr.intes, method = "euclidean")
+# Ordination by PCoA
+ord_philr.intes <- ordinate(pseq_t.intes, 'PCoA', distance = dist_philr.intes)
+```
+
+##Extract principal coordinates and variance explained for plotting.
+```{r prep_philr}
+pco_philr <- as.data.frame(ord_philr$vectors) %>%
+  rownames_to_column("rownames") %>%
+  full_join(., rownames_to_column(metadata, "rownames"), by = "rownames") 
+labs_philr <- paste0("PCo", 1:length(ord_philr$values$Eigenvalues), ": ", 
+                     round((100*ord_philr$values$Eigenvalues/sum(ord_philr$values$Eigenvalues)),1), "%")
+
+
+# gut 
+pco_philr.intes <- as.data.frame(ord_philr.intes$vectors) %>%
+  rownames_to_column("rownames") %>%
+  full_join(., rownames_to_column(metadata.intes, "rownames"), by = "rownames") 
+labs_philr.intes <- paste0("PCo", 1:length(ord_philr.intes$values$Eigenvalues), ": ", 
+                     round((100*ord_philr.intes$values$Eigenvalues/sum(ord_philr.intes$values$Eigenvalues)),1), "%")
+```
+
+### ##Plotting the PCOA for PhILR transformed data (2D plot)
+```{r pcoa_philr_2d}
+p_philr <- ggplot(pco_philr, aes(x = Axis.1, y = Axis.2, color = Region_Regime)) +
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) +
+  geom_point(size = 4) +
+  labs(title = "PCoA of PhILR transformed data", color = "Region_Regime",
+       x = labs_philr[1],
+       y = labs_philr[2]) +
+  scale_color_manual(values = brewer.pal(n = 10, name = "Paired")[c(5,6,1,2,3,4,9,10,8,7)]) +
+  theme_cowplot() +
+  panel_border(colour = "black") 
+p_philr
+ggsave("figures/p_philr.tiff", width = 10, height = 6,
+       units = "in", dpi = 300, compression = "lzw")
+
+
+# gut 
+p_philr.intes <- ggplot(pco_philr.intes, aes(x = Axis.1, y = Axis.2, color = Region_Regime)) +
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) +
+  geom_point(size = 4) +
+  labs(title = "PCoA of PhILR transformed data", color = "Region_Regime",
+       x = labs_philr.intes[1],
+       y = labs_philr.intes[2]) +
+  scale_color_manual(values = brewer.pal(n = 6, name = "Paired")[c(5,6,1,2,3,4)]) +
+  theme_cowplot() +
+  panel_border(colour = "black") 
+p_philr.intes
+ggsave("figures/p_philr.intes.tiff", width = 10, height = 6,
+       units = "in", dpi = 300, compression = "lzw")
+```
+
+
+##Plotting the PCOA for PhILR transformed data (interactive 3D plot)
+```{r}
+plot_ly(x = pco_philr[,"Axis.1"], y = pco_philr[,"Axis.2"], z = pco_philr[,"Axis.3"], 
+        type = "scatter3d", mode = "markers", color = metadata$Region_Regime, 
+        colors = brewer.pal(n = 10, name = "Paired")[c(5,6,1,2,3,4,9,10,8,7)]) %>%
+        layout(scene = list(xaxis = list(title = labs_philr[1]),
+                            yaxis = list(title = labs_philr[2]),
+                            zaxis = list(title = labs_philr[3])
+                        ))
+
+plot_ly(x = pco_philr.intes[,"Axis.1"], y = pco_philr.intes[,"Axis.2"], z = pco_philr.intes[,"Axis.3"], 
+        type = "scatter3d", mode = "markers", color = metadata.intes$Region_Regime, 
+        colors = brewer.pal(n = 6, name = "Paired")[c(5,6,1,2,3,4)]) %>%
+  layout(scene = list(xaxis = list(title = labs_philr.intes[1]),
+                      yaxis = list(title = labs_philr.intes[2]),
+                      zaxis = list(title = labs_philr.intes[3])
+  ))
+```
+
+## Assemble plots
+```{r assemble_pcoa_plots, fig.width=10, fig.height=6}
+# Get legend
+legend <- get_legend(p_jac)
+# Reduce point size
+p_jac$layers[[3]]$aes_params$size <- 3 
+p_uwuf$layers[[3]]$aes_params$size <- 3
+p_aitchison$layers[[3]]$aes_params$size <- 3
+p_philr$layers[[3]]$aes_params$size <- 3
+# Assemble plots
+ps <- plot_grid(
+  p_jac + theme(legend.position = "none", plot.title = element_blank()), 
+  p_uwuf + theme(legend.position = "none", plot.title = element_blank()),
+  p_aitchison + theme(legend.position = "none", plot.title = element_blank()), 
+  p_philr + theme(legend.position = "none", plot.title = element_blank()),
+  ncol = 2, labels = "AUTO", align = 'vh')
+# Add legend to the assembled plot
+plot_grid(ps, legend, rel_widths = c(6, 1))
+# Export the plot
+ggsave("figures/Figure beta_div_4.tiff", width = 10, height = 6,
+       units = "in", dpi = 300, compression = "lzw")
+
+# gut 
+# Get legend
+legend.intes <- get_legend(p_jac.intes)
+# Reduce point size
+p_jac.intes$layers[[3]]$aes_params$size <- 3 
+p_uwuf.intes$layers[[3]]$aes_params$size <- 3
+p_aitchison.intes$layers[[3]]$aes_params$size <- 3
+p_aitchison.intes$layers[[3]]$aes_params$size <- 3
+# Assemble plots
+ps.intes <- plot_grid(
+  p_jac.intes + theme(legend.position = "none", plot.title = element_blank()), 
+  p_uwuf.intes + theme(legend.position = "none", plot.title = element_blank()),
+  p_aitchison.intes + theme(legend.position = "none", plot.title = element_blank()), 
+  p_aitchison.intes + theme(legend.position = "none", plot.title = element_blank()),
+  ncol = 2, labels = "AUTO", align = 'vh')
+# Add legend.intes to the assembled plot
+plot_grid(ps.intes, legend.intes, rel_widths = c(6, 1))
+# Export the plot
+ggsave("figures/Figure beta_div_4.intes.tiff", width = 10, height = 6,
+       units = "in", dpi = 300, compression = "lzw")
+```
+
+
+
+## permutational multivariate analysis of variance (PERMANOVA) test for the four beta-diversity distances on rarified and full phyloseq objects
+
+```{r}
+##for the unweighted unifrac distance
+wunifrac_dist_adonis <- vegan::adonis(wunifrac_dist ~ phyloseq::sample_data(ps.prev.tree.rare)$Region_Regime)
+summary_output_wunifrac_dist_adonis <- capture.output(summary(wunifrac_dist_adonis))
+writeLines(summary_output_wunifrac_dist_adonis, "tables/wunifrac_dist_adonis.txt")
+write.table(wunifrac_dist_adonis$aov.tab, "tables/wunifrac_dist_aov.tab.adonis.tsv", sep = "\t", quote=F, col.names=NA)
+
+##for the  jaccard distance
+jacc_dist_adonis <- vegan::adonis(jacc_dist ~ phyloseq::sample_data(ps.prev.tree.rare)$Region_Regime)
+summary.output_jacc_dist_adonis <- capture.output(summary(jacc_dist_adonis))
+writeLines(summary.output_jacc_dist_adonis, "tables/jacc_dist_adonis.txt")
+write.table(jacc_dist_adonis$aov.tab, "tables/jacc_dist_aov.tab.adonis.tsv", sep = "\t", quote=F, col.names=NA)
+
+##Compute aitchison distance 
+aitchison_dist <- phyloseq::distance(ps_clr, method = "euclidean")
+##PERMANOVA for the aitchison distance
+aitchison_dist_adonis <- vegan::adonis(aitchison_dist ~ phyloseq::sample_data(ps.prev.tree)$Region_Regime)
+summary.output_aitchison_dist_adonis <- capture.output(summary(aitchison_dist_adonis))
+writeLines(summary.output_aitchison_dist_adonis, "tables/aitchison_dist_adonis.txt")
+write.table(aitchison_dist_adonis$aov.tab, "tables/aitchison_dist_aov.tab.adonis.tsv", sep = "\t", quote=F, col.names=NA)
+# by sample
+aitchison_dist_adonis2 <- vegan::adonis(aitchison_dist ~ phyloseq::sample_data(ps.prev.tree)$sample)
+summary.output_aitchison_dist_adonis2 <- capture.output(summary(aitchison_dist_adonis2))
+writeLines(summary.output_aitchison_dist_adonis2, "tables/aitchison_dist_adonis_sample.txt")
+write.table(aitchison_dist_adonis2$aov.tab, "tables/aitchison_dist_aov.tab.adonis_sample.tsv", sep = "\t", quote=F, col.names=NA)
+## anosim for aitchison distance
+aitchison_dist.anosim <- anosim(aitchison_dist, sample_data(ps.prev.tree)$Region_Regime)
+summary.output <- capture.output(summary(aitchison_dist.anosim))
+writeLines(summary.output, "tables/aitchison_dist.anosim.txt")
+# by sample
+aitchison_dist.anosim2 <- anosim(aitchison_dist, sample_data(ps.prev.tree)$sample)
+summary.output <- capture.output(summary(aitchison_dist.anosim2))
+writeLines(summary.output, "tables/aitchison_dist.anosim_sample.txt")
+# intesWtr
+ps.prev.intesWtr <- subset_samples(ps.prev.tree, sample == "gut" | sample == "water")
+ps.prev.intesWtr <- prune_taxa(taxa_sums(ps.prev.intesWtr) > 0, ps.prev.intesWtr)
+ps_clr.intesWtr <- microbiome::transform(ps.prev.intesWtr, "clr") 
+aitchison_dist.intesWtr <- phyloseq::distance(ps_clr.intesWtr, method = "euclidean")
+#anosim
+aitchison_dist.anosim.intesWtr <- anosim(aitchison_dist.intesWtr, sample_data(ps.prev.intesWtr)$sample)
+summary.output <- capture.output(summary(aitchison_dist.anosim.intesWtr))
+writeLines(summary.output, "tables/aitchison_dist.anosim.intesWtr.txt")
+# intesFeed
+ps.prev.intesFeed <- subset_samples(ps.prev.tree, sample == "gut" | sample == "feed")
+ps.prev.intesFeed <- prune_taxa(taxa_sums(ps.prev.intesFeed) > 0, ps.prev.intesFeed)
+ps_clr.intesFeed <- microbiome::transform(ps.prev.intesFeed, "clr")
+aitchison_dist.intesFeed <- phyloseq::distance(ps_clr.intesFeed, method = "euclidean")
+#anosim
+aitchison_dist.anosim.intesFeed <- anosim(aitchison_dist.intesFeed, sample_data(ps.prev.intesFeed)$sample)
+summary.output <- capture.output(summary(aitchison_dist.anosim.intesFeed))
+writeLines(summary.output, "tables/aitchison_dist.anosim.intesFeed.txt")
+# WtrFeed
+ps.prev.WtrFeed <- subset_samples(ps.prev.tree, sample == "water" | sample == "feed")
+ps.prev.WtrFeed <- prune_taxa(taxa_sums(ps.prev.WtrFeed) > 0, ps.prev.WtrFeed)
+ps_clr.WtrFeed <- microbiome::transform(ps.prev.WtrFeed, "clr")
+aitchison_dist.WtrFeed <- phyloseq::distance(ps_clr.WtrFeed, method = "euclidean")
+#anosim
+aitchison_dist.anosim.WtrFeed <- anosim(aitchison_dist.WtrFeed, sample_data(ps.prev.WtrFeed)$sample)
+summary.output <- capture.output(summary(aitchison_dist.anosim.WtrFeed))
+writeLines(summary.output, "tables/aitchison_dist.anosim.WtrFeed.txt")
+
+##PERMANOVA for the PhILR transformed data
+dist_philr_adonis <- vegan::adonis(dist_philr ~ phyloseq::sample_data(ps.prev.tree)$Region_Regime)
+summary.output_dist_philr_adonis <- capture.output(summary(dist_philr_adonis))
+writeLines(summary.output_dist_philr_adonis, "tables/dist_philr_adonis.txt")
+write.table(dist_philr_adonis$aov.tab, "tables/dist_philr_aov.tab.adonis.tsv", sep = "\t", quote=F, col.names=NA)
+
+
+# gut 
+##for the unweighted unifrac distance
+wunifrac_dist.intes_adonis <- vegan::adonis(wunifrac_dist.intes ~ phyloseq::sample_data(ps.prev.intes.tree.rare)$Region_Regime)
+summary_output_wunifrac_dist.intes_adonis <- capture.output(summary(wunifrac_dist.intes_adonis))
+writeLines(summary_output_wunifrac_dist.intes_adonis, "tables/wunifrac_dist.intes_adonis.txt")
+write.table(wunifrac_dist.intes_adonis$aov.tab, "tables/wunifrac_dist.intes_aov.tab.adonis.tsv", sep = "\t", quote=F, col.names=NA)
+
+##for the  jaccard distance
+jacc_dist.intes_adonis <- vegan::adonis(jacc_dist.intes ~ phyloseq::sample_data(ps.prev.intes.tree.rare)$Region_Regime)
+summary.output_jacc_dist.intes_adonis <- capture.output(summary(jacc_dist.intes_adonis))
+writeLines(summary.output_jacc_dist.intes_adonis, "tables/jacc_dist.intes_adonis.txt")
+write.table(jacc_dist.intes_adonis$aov.tab, "tables/jacc_dist.intes_aov.tab.adonis.tsv", sep = "\t", quote=F, col.names=NA)
+
+##Compute aitchison distance 
+aitchison_dist.intes <- phyloseq::distance(ps_clr.intes, method = "euclidean")
+##PERMANOVA for the aitchison distance
+aitchison_dist.intes_adonis <- vegan::adonis(aitchison_dist.intes ~ phyloseq::sample_data(ps.prev.intes.tree)$Region_Regime)
+summary.output_aitchison_dist.intes_adonis <- capture.output(summary(aitchison_dist.intes_adonis))
+writeLines(summary.output_aitchison_dist.intes_adonis, "tables/aitchison_dist.intes_adonis.txt")
+write.table(aitchison_dist.intes_adonis$aov.tab, "tables/aitchison_dist.intes_aov.tab.adonis.tsv", sep = "\t", quote=F, col.names=NA)
+
+##PERMANOVA for the PhILR transformed data
+dist_philr.intes_adonis <- vegan::adonis(dist_philr.intes ~ phyloseq::sample_data(ps.prev.intes.tree)$Region_Regime)
+summary.output_dist_philr.intes_adonis <- capture.output(summary(dist_philr.intes_adonis))
+writeLines(summary.output_dist_philr.intes_adonis, "tables/dist_philr.intes_adonis.txt")
+write.table(dist_philr.intes_adonis$aov.tab, "tables/dist_philr.intes_aov.tab.adonis.tsv", sep = "\t", quote=F, col.names=NA)
+```
+
+## with the script in the preceeding chunks, we have shown with PERMANOVA test that there is significance difference (P < 0.001 ***) four the four beta diversity indices, now here we are interested in pairwise comparison to figure out how each diet differs from one another. In this particular study, the dietary consist of a negative control (FM), a positive control (SBM) and four other diets containing SBM with yeasts (ICJ, ACJ, IWA, and AWA). for this comparison, we will compare the four treatment with the two control diets. However, if you are interested in comparing all the diets the codes are also written in the chunks 
+#PERMANOVA pariwise comparison for unweighted unifrac distance
+```{r}
+##PERMANOVA pariwise comparison for unweighted unifrac distance
+pw_uwuf_full <- pairwise.adonis(wunifrac_dist, pco_uwuf$Region_Regime)  
+# export data as excel file
+write.csv(pw_uwuf_full, file = "tables/PERMANOVA for unweighted unifrac.csv", row.names = FALSE)
+```
+#PERMANOVA pariwise comparison for jaccard distance
+```{r}
+##PERMANOVA pariwise comparison for jaccard distance
+pw_jac_full <- pairwise.adonis(jacc_dist, pco_jac$Region_Regime)  
+# export data as excel file
+write.csv(pw_jac_full, file = "tables/PERMANOVA for jaccard distance.csv", row.names = FALSE)
+```
+#PERMANOVA pariwise comparison for Robust aitchison distance
+```{r}
+##PERMANOVA pariwise comparison for Robust aitchison distance
+pw_aitchison_full <- pairwise.adonis(aitchison_dist, pco_aitchison$Region_Regime)  
+# export data as excel file
+write.csv(pw_aitchison_full, file = "tables/PERMANOVA for Robust aitchison distance.csv", row.names = FALSE)
+```
+#PERMANOVA pariwise comparison for Robust aitchison distance BY SAMPLE
+```{r}
+##PERMANOVA pariwise comparison for Robust aitchison distance
+pw_aitchison_full_sample <- pairwise.adonis(aitchison_dist, pco_aitchison2$sample)  
+# export data as excel file
+write.csv(pw_aitchison_full_sample, file = "tables/PERMANOVA for Robust aitchison distance_sample.csv", row.names = FALSE)
+```
+#PERMANOVA pariwise comparison for PhILR distance
+```{r}
+##PERMANOVA pariwise comparison for Robust aitchison distance
+pw_philr_full <- pairwise.adonis(dist_philr, pco_philr$Region_Regime)  
+# export data as excel file
+write.csv(pw_philr_full, file = "tables/PERMANOVA for PhILR distance.csv", row.names = FALSE)
+```
+
+### GUT
+#PERMANOVA pariwise comparison for unweighted unifrac distance
+```{r}
+##PERMANOVA pariwise comparison for unweighted unifrac distance
+pw_uwuf_full.intes <- pairwise.adonis(wunifrac_dist.intes, pco_uwuf.intes$Region_Regime)  
+# export data as excel file
+write.csv(pw_uwuf_full.intes, file = "tables/PERMANOVA for unweighted unifrac.intes.csv", row.names = FALSE)
+```
+#PERMANOVA pariwise comparison for jaccard distance
+```{r}
+##PERMANOVA pariwise comparison for jaccard distance
+pw_jac_full.intes <- pairwise.adonis(jacc_dist.intes, pco_jac.intes$Region_Regime)  
+# export data as excel file
+write.csv(pw_jac_full.intes, file = "tables/PERMANOVA for jaccard distance.intes.csv", row.names = FALSE)
+```
+#PERMANOVA pariwise comparison for Robust aitchison distance
+```{r}
+##PERMANOVA pariwise comparison for Robust aitchison distance
+pw_aitchison_full.intes <- pairwise.adonis(aitchison_dist.intes, pco_aitchison.intes$Region_Regime)  
+# export data as excel file
+write.csv(pw_aitchison_full.intes, file = "tables/PERMANOVA for Robust aitchison distance.intes.csv", row.names = FALSE)
+```
+#PERMANOVA pariwise comparison for PhILR distance
+```{r}
+##PERMANOVA pariwise comparison for Robust aitchison distance
+pw_philr_full.intes <- pairwise.adonis(dist_philr.intes, pco_philr.intes$Region_Regime)  
+# export data as excel file
+write.csv(pw_philr_full.intes, file = "tables/PERMANOVA for PhILR distance.intes.csv", row.names = FALSE)
+```
+
+#Since the PERMANOVA is testing differences in both location and dispersion effects, it's important to test the homogeneity of multivariate dispersions following a significant PERMANVOA result.The homogeneity of multivariate dispersions can be assessed visually (PCoA plot/boxplot) or via a statistical test called PERMDISP, which is implemented in R by the `betadisper()` function from the *vegan* package.
+## Unweighted distance
+```{r}
+dispr_uwuf <- vegan::betadisper(wunifrac_dist, phyloseq::sample_data(ps.prev.tree.rare)$Region_Regime, type = "median")
+dispr_uwuf # saved the output manually!
+# Permutaion test
+permdisp_uwuf <- permutest(dispr_uwuf, pairwise = TRUE, permutations = 999)
+permdisp_uwuf # saved the output manually!
+
+# gut 
+dispr_uwuf.intes <- vegan::betadisper(wunifrac_dist.intes, phyloseq::sample_data(ps.prev.intes.tree.rare)$Region_Regime, type = "median")
+dispr_uwuf.intes # saved the output manually!
+# Permutaion test
+permdisp_uwuf.intes <- permutest(dispr_uwuf.intes, pairwise = TRUE, permutations = 999)
+permdisp_uwuf.intes # saved the output manually!
+```
+#Visual inspection
+```{r}
+#PCOA plot showing the distance to centroid for each group
+tiff("figures/UnwUnifrac.tiff", units = "in", res = 800, width = 10, height = 6, compression = "lzw")
+pc_uwuf <- plot(dispr_uwuf, main = "Ordination Centroids and Dispersion Labeled: Unweighted unifrac", sub = "")
+dev.off()
+#Box plot showing the distance to centroid for each group
+bp_uwuf <- data.frame(dist = dispr_uwuf$distances, group = dispr_uwuf$group) %>%
+  ggplot(aes(x = group, y = dist)) +
+    geom_boxplot(aes(fill =  group)) +
+    labs(x = "Sample_Type", y = "Distance to centroid", 
+         title = "Unweighted unifrac distance", fill = "Sample_Type") +
+    theme_minimal(base_size = 14) +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    theme(axis.text.x = element_text(angle = 90))
+bp_uwuf
+ggsave("figures/bp_uwuf.tiff", width = 10, height = 6,
+       units = "in", dpi = 300, compression = "lzw")
+
+
+# gut 
+#PCOA plot showing the distance to centroid for each group
+tiff("figures/UnwUnifrac.intes.tiff", units = "in", res = 800, width = 10, height = 6, compression = "lzw")
+pc_uwuf.intes <- plot(dispr_uwuf.intes, main = "Ordination Centroids and Dispersion Labeled: Unweighted unifrac", sub = "")
+dev.off()
+#Box plot showing the distance to centroid for each group
+bp_uwuf.intes <- data.frame(dist = dispr_uwuf.intes$distances, group = dispr_uwuf.intes$group) %>%
+  ggplot(aes(x = group, y = dist)) +
+  geom_boxplot(aes(fill =  group)) +
+  labs(x = "Sample_Type", y = "Distance to centroid", 
+       title = "Unweighted unifrac distance", fill = "Sample_Type") +
+  theme_minimal(base_size = 14) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 90))
+bp_uwuf.intes
+ggsave("figures/bp_uwuf.intes.tiff", width = 10, height = 6,
+       units = "in", dpi = 300, compression = "lzw")
+```
+## jaccard distance
+```{r}
+dispr_jac <- vegan::betadisper(jacc_dist, phyloseq::sample_data(ps.prev.tree.rare)$Region_Regime, type = "median")
+dispr_jac
+# Permutaion test
+permdisp_jac <- permutest(dispr_jac, pairwise = TRUE, permutations = 999)
+permdisp_jac
+
+
+# gut 
+dispr_jac.intes <- vegan::betadisper(jacc_dist.intes, phyloseq::sample_data(ps.prev.intes.tree.rare)$Region_Regime, type = "median")
+dispr_jacc.intes # saved the output manually!
+# Permutaion test
+permdisp_jac.intes <- permutest(dispr_jac.intes, pairwise = TRUE, permutations = 999)
+permdisp_jac.intes # saved the output manually!
+```
+#Visual inspection
+```{r}
+#PCOA plot showing the distance to centroid for each group
+tiff("figures/Jaccard.tiff", units = "in", res = 800, width = 10, height = 6, compression = "lzw")
+pc_jac <- plot(dispr_jac, main = "Ordination Centroids and Dispersion Labeled: Jaccard distance", sub = "")
+dev.off()
+#Box plot showing the distance to centroid for each group
+bp_jac <- data.frame(dist = dispr_jac$distances, group = dispr_jac$group) %>%
+  ggplot(aes(x = factor(group), y = dist)) +
+    geom_boxplot(aes(fill =  group)) +
+    labs(x = "Sample_Type", y = "Distance to centroid", 
+         title = "Jaccard distance", fill = "Sample_Type") +
+    theme_minimal(base_size = 14) +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    theme(axis.text.x = element_text(angle = 90))
+bp_jac
+ggsave("figures/bp_jac.tiff", width = 10, height = 6,
+       units = "in", dpi = 300, compression = "lzw")
+
+# gut 
+#PCOA plot showing the distance to centroid for each group
+tiff("figures/Jaccard.intes.tiff", units = "in", res = 800, width = 10, height = 6, compression = "lzw")
+pc_jac.intes <- plot(dispr_jac.intes, main = "Ordination Centroids and Dispersion Labeled: Jaccard distance", sub = "")
+dev.off()
+#Box plot showing the distance to centroid for each group
+bp_jac.intes <- data.frame(dist = dispr_jac.intes$distances, group = dispr_jac.intes$group) %>%
+  ggplot(aes(x = factor(group), y = dist)) +
+  geom_boxplot(aes(fill =  group)) +
+  labs(x = "Sample_Type", y = "Distance to centroid", 
+       title = "Jaccard distance", fill = "Sample_Type") +
+  theme_minimal(base_size = 14) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 90))
+bp_jac.intes
+ggsave("figures/bp_jac.intes.tiff", width = 10, height = 6,
+       units = "in", dpi = 300, compression = "lzw")
+```
+## Robust aitchison distance
+```{r}
+dispr_aitchison <- vegan::betadisper(aitchison_dist, phyloseq::sample_data(ps.prev.tree)$Region_Regime, type = "median")
+dispr_aitchison
+#by sample 
+dispr_aitchison2 <- vegan::betadisper(aitchison_dist, phyloseq::sample_data(ps.prev.tree)$sample, type = "median")
+dispr_aitchison2
+# Permutaion test
+permdisp_aitchison <- permutest(dispr_aitchison, pairwise = TRUE, permutations = 999)
+permdisp_aitchison
+#by sample
+permdisp_aitchison2 <- permutest(dispr_aitchison2, pairwise = TRUE, permutations = 999)
+permdisp_aitchison2
+# gut 
+dispr_aitchison.intes <- vegan::betadisper(aitchison_dist.intes, phyloseq::sample_data(ps.prev.intes.tree)$Region_Regime, type = "median")
+dispr_aitchison.intes
+# Permutaion test
+permdisp_aitchison.intes <- permutest(dispr_aitchison.intes, pairwise = TRUE, permutations = 999)
+permdisp_aitchison.intes
+```
+#Visual inspection
+```{r}
+#PCOA plot showing the distance to centroid for each group
+tiff("figures/Aitchison.tiff", units = "in", res = 800, width = 10, height = 6, compression = "lzw")
+pc_aitchison <- plot(dispr_aitchison, main = "Ordination Centroids and Dispersion Labeled: Robust Aitchison distance", sub = "")
+dev.off()
+#Box plot showing the distance to centroid for each group
+bp_aitchison<- data.frame(dist = dispr_aitchison$distances, group = dispr_aitchison$group) %>%
+  ggplot(aes(x = group, y = dist)) +
+    geom_boxplot(aes(color =  group)) +
+    labs(x = "Sample_Type", y = "Distance to centroid", 
+         title = "Robust Aitchison distance", fill = "Sample_Type") +
+    theme_minimal(base_size = 14) +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    theme(axis.text.x = element_text(angle = 90))
+bp_aitchison
+ggsave("figures/bp_aitchison.tiff", width = 5, height = 4,
+       units = "in", dpi = 300, compression = "lzw")
+# intesFeedWtr by sample 
+tiff("figures/Aitchison_sample.tiff", units = "in", res = 800, width = 5, height = 5, compression = "lzw")
+pc_aitchison2 <- plot(dispr_aitchison2, main = "Ordination Centroids and Dispersion", sub = "")
+dev.off()
+#Box plot showing the distance to centroid for each group
+bp_aitchison2<- data.frame(dist = dispr_aitchison2$distances, group = dispr_aitchison2$group) %>%
+  ggplot(aes(x = group, y = dist)) +
+    geom_boxplot(aes(color =  group)) +
+    labs(x = "sample", y = "Distance to centroid", 
+         title = "Robust Aitchison distance", color = "sample") +
+    theme_minimal(base_size = 14) +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    theme(axis.text.x = element_blank())
+bp_aitchison2
+ggsave("figures/bp_aitchison2.tiff", width = 5, height = 4,
+       units = "in", dpi = 300, compression = "lzw")
+
+# gut 
+#PCOA plot showing the distance to centroid for each group
+tiff("figures/Aitchison.intes.tiff", units = "in", res = 800, width = 10, height = 6, compression = "lzw")
+pc_aitchison.intes <- plot(dispr_aitchison.intes, main = "Ordination Centroids and Dispersion Labeled: Robust Aitchison distance", sub = "")
+dev.off()
+#Box plot showing the distance to centroid for each group
+bp_aitchison.intes<- data.frame(dist = dispr_aitchison.intes$distances, group = dispr_aitchison.intes$group) %>%
+  ggplot(aes(x = group, y = dist)) +
+  geom_boxplot(aes(fill =  group)) +
+  labs(x = "Sample_Type", y = "Distance to centroid", 
+       title = "Robust Aitchison distance", fill = "Sample_Type") +
+  theme_minimal(base_size = 14) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 90))
+bp_aitchison.intes
+ggsave("figures/bp_aitchison.intes.tiff", width = 10, height = 6,
+       units = "in", dpi = 300, compression = "lzw")
+```
+
+## ## PHILR transformed euclidean distance
+```{r}
+dispr_philr <- vegan::betadisper(dist_philr, phyloseq::sample_data(ps.prev.tree)$Region_Regime, type = "median")
+dispr_philr
+# Permutaion test
+permdisp_philr <- permutest(dispr_philr, pairwise = TRUE, permutations = 999)
+permdisp_philr
+
+# gut 
+dispr_philr.intes <- vegan::betadisper(dist_philr.intes, phyloseq::sample_data(ps.prev.intes.tree)$Region_Regime, type = "median")
+dispr_philr.intes
+# Permutaion test
+permdisp_philr.intes <- permutest(dispr_philr.intes, pairwise = TRUE, permutations = 999)
+permdisp_philr.intes
+```
+#Visual inspection
+```{r}
+#PCOA plot showing the distance to centroid for each group
+tiff("figures/Philr.tiff", units = "in", res = 800, width = 10, height = 6, compression = "lzw")
+pc_philr <- plot(dispr_philr, main = "Ordination Centroids and Dispersion Labeled: PHILR transformed euclidean distance", sub = "")
+dev.off()
+#Box plot showing the distance to centroid for each group
+bp_philr<- data.frame(dist = dispr_philr$distances, group = dispr_philr$group) %>%
+  ggplot(aes(x = group,y = dist)) +
+    geom_boxplot(aes(fill =  group)) +
+    labs(x = "Sample_Type", y = "Distance to centroid", 
+         title = "PHILR distance", fill = "Sample_Type") +
+    theme_minimal(base_size = 14) +
+    theme(plot.title = element_text(hjust = 0.5)) +
+    theme(axis.text.x = element_text(angle = 90))
+bp_philr
+ggsave("figures/bp_philr.tiff", width = 10, height = 6,
+       units = "in", dpi = 300, compression = "lzw")
+
+# gut 
+#PCOA plot showing the distance to centroid for each group
+tiff("figures/Philr.intes.tiff", units = "in", res = 800, width = 10, height = 6, compression = "lzw")
+pc_philr.intes <- plot(dispr_philr.intes, main = "Ordination Centroids and Dispersion Labeled: PHILR transformed euclidean distance", sub = "")
+dev.off()
+#Box plot showing the distance to centroid for each group
+bp_philr.intes<- data.frame(dist = dispr_philr.intes$distances, group = dispr_philr.intes$group) %>%
+  ggplot(aes(x = group,y = dist)) +
+  geom_boxplot(aes(fill =  group)) +
+  labs(x = "Sample_Type", y = "Distance to centroid", 
+       title = "PHILR distance", fill = "Sample_Type") +
+  theme_minimal(base_size = 14) +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.text.x = element_text(angle = 90))
+bp_philr.intes
+ggsave("figures/bp_philr.intes.tiff", width = 10, height = 6,
+       units = "in", dpi = 300, compression = "lzw")
+```
+
+### Assemble PCOA and Boxplot for testing the homogeneity of multivariate dispersions 
+```{r}
+tiff("figures/PERMANOVA PCOA.tiff", units = "in", res = 800, width = 16, height = 10, compression = "lzw")
+old.par <- par(mfrow=c(2, 2))
+pc_jac <- plot(dispr_jac, main = "Ordination Centroids and Dispersion Labeled:Jaccard distance", sub = "")
+pc_uwuf <- plot(dispr_uwuf, main = "Ordination Centroids and Dispersion Labeled:Unweighted unifrac", sub = "")
+pc_aitchison <- plot(dispr_aitchison, main = "Ordination Centroids and Dispersion Labeled:Robust aitchison distance", sub = "")
+pc_philr <- plot(dispr_philr, main = "Ordination Centroids and Dispersion Labeled:PHILR transformed euclidean distance", sub = "")
+dev.off()
+
+# gut 
+tiff("figures/PERMANOVA PCOA.intes.tiff", units = "in", res = 800, width = 16, height = 10, compression = "lzw")
+old.par <- par(mfrow=c(2, 2))
+pc_jac.intes <- plot(dispr_jac.intes, main = "Ordination Centroids and Dispersion Labeled:Jaccard distance", sub = "")
+pc_uwuf.intes <- plot(dispr_uwuf.intes, main = "Ordination Centroids and Dispersion Labeled:Unweighted unifrac", sub = "")
+pc_aitchison.intes <- plot(dispr_aitchison.intes, main = "Ordination Centroids and Dispersion Labeled:Robust aitchison distance", sub = "")
+pc_philr.intes <- plot(dispr_philr.intes, main = "Ordination Centroids and Dispersion Labeled:PHILR transformed euclidean distance", sub = "")
+dev.off()
+```
+##Assemble boxplot
+```{r}
+# Get legend
+legend <- get_legend(bp_jac)
+# Assemble plots
+bps <- plot_grid(
+  bp_jac + theme(legend.position = "none", plot.title = element_blank()), 
+  bp_uwuf + theme(legend.position = "none", plot.title = element_blank()),
+  bp_aitchison + theme(legend.position = "none", plot.title = element_blank()), 
+  bp_philr + theme(legend.position = "none", plot.title = element_blank()),
+  ncol = 2, labels = "AUTO", align = 'vh')
+# Add legend to the assembled plot
+plot_grid(bps, legend, rel_widths = c(6, 1))
+# Export the plot
+ggsave("figures/betaDiv_boxPlots.tiff", width = 12, height = 7.5,
+       units = "in", dpi = 300, compression = "lzw")
+
+# gut 
+# Get legend
+legend.intes <- get_legend(bp_jac.intes)
+# Assemble plots
+bps.intes <- plot_grid(
+  bp_jac.intes + theme(legend.position = "none", plot.title = element_blank()), 
+  bp_uwuf.intes + theme(legend.position = "none", plot.title = element_blank()),
+  bp_aitchison.intes + theme(legend.position = "none", plot.title = element_blank()), 
+  bp_philr.intes + theme(legend.position = "none", plot.title = element_blank()),
+  ncol = 2, labels = "AUTO", align = 'vh')
+# Add legend.intes to the assembled plot
+plot_grid(bps.intes, legend.intes, rel_widths = c(6, 1))
+# Export the plot
+ggsave("figures/betaDiv_boxPlots.intes.tiff", width = 12, height = 7.5,
+       units = "in", dpi = 300, compression = "lzw")
+```

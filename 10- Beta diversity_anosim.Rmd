@@ -1,0 +1,241 @@
+---
+title: "Beta diversity"
+author: "Marwa Tawfik"
+date: "07 07 2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# load libraries ----
+library(tidyverse)
+library(vegan)
+library(phyloseq)
+library(EcolUtils)
+```
+
+```{r}
+# import data
+ps.prev.intes <-readRDS("phyobjects/STEP 16/ps.prev.intes.f.rds")
+```
+
+```{r}
+# log transform 
+ps.prev.intes.log <- transform_sample_counts(ps.prev.intes, function(x) log(1 + x))
+```
+
+```{r}
+# dataframe for metadata
+meta.ps.prev.intes.log <- as(sample_data(ps.prev.intes.log), "data.frame")
+```
+
+ANOSIM for stat
+```{r}
+# MMV vs VMV in whole gut
+dist.bray.intes.log <- phyloseq::distance(ps.prev.intes.log, method = "bray")
+dist.bray.intes.log.anosim <- anosim(dist.bray.intes.log, meta.ps.prev.intes.log$Regime)
+summary.output <- capture.output(summary(dist.bray.intes.log.anosim))
+summary.output
+```
+
+```{r}
+# MMV vs VMV
+# pyloric 
+ps.prev.intes.pyloric <- subset_samples(ps.prev.intes, Region == "pyloric")
+ps.prev.intes.pyloric <- prune_taxa(taxa_sums(ps.prev.intes.pyloric) > 0, ps.prev.intes.pyloric)
+ps.prev.intes.pyloric.log <- transform_sample_counts(ps.prev.intes.pyloric, function(x) log(1 + x))
+meta.ps.prev.intes.pyloric.log <- as(sample_data(ps.prev.intes.pyloric.log), "data.frame")
+dist.bray.intes.pyloric.log <- phyloseq::distance(ps.prev.intes.pyloric.log, method = "bray")
+dist.bray.intes.pyloric.log.anosim <- anosim(dist.bray.intes.pyloric.log, meta.ps.prev.intes.pyloric.log$Region_Regime)
+summary.output <- capture.output(summary(dist.bray.intes.pyloric.log.anosim))
+summary.output
+```
+
+```{r}
+# MMV vs VMV
+# middle 
+ps.prev.intes.middle <- subset_samples(ps.prev.intes, Region == "middle")
+ps.prev.intes.middle <- prune_taxa(taxa_sums(ps.prev.intes.middle) > 0, ps.prev.intes.middle)
+ps.prev.intes.middle.log <- transform_sample_counts(ps.prev.intes.middle, function(x) log(1 + x))
+meta.ps.prev.intes.middle.log <- as(sample_data(ps.prev.intes.middle.log), "data.frame")
+dist.bray.intes.middle.log <- phyloseq::distance(ps.prev.intes.middle.log, method = "bray")
+dist.bray.intes.middle.log.anosim <- anosim(dist.bray.intes.middle.log, meta.ps.prev.intes.middle.log$Region_Regime)
+summary.output <- capture.output(summary(dist.bray.intes.middle.log.anosim))
+summary.output
+```
+
+```{r}
+# MMV vs VMV
+# distal 
+ps.prev.intes.distal <- subset_samples(ps.prev.intes, Region == "distal")
+ps.prev.intes.distal <- prune_taxa(taxa_sums(ps.prev.intes.distal) > 0, ps.prev.intes.distal)
+ps.prev.intes.distal.log <- transform_sample_counts(ps.prev.intes.distal, function(x) log(1 + x))
+meta.ps.prev.intes.distal.log <- as(sample_data(ps.prev.intes.distal.log), "data.frame")
+dist.bray.intes.distal.log <- phyloseq::distance(ps.prev.intes.distal.log, method = "bray")
+dist.bray.intes.distal.log.anosim <- anosim(dist.bray.intes.distal.log, meta.ps.prev.intes.distal.log$Region_Regime)
+summary.output <- capture.output(summary(dist.bray.intes.distal.log.anosim))
+summary.output
+```
+
+```{r}
+# preprocessing (Region as ordinal data)
+meta.ps.prev.intes.log$gut.order <- NA
+meta.ps.prev.intes.log <- as(sample_data(ps.prev.intes.log), "data.frame")
+meta.ps.prev.intes.log$gut.order[meta.ps.prev.intes.log$Region == "pyloric"] <- 1
+meta.ps.prev.intes.log$gut.order[meta.ps.prev.intes.log$Region == "middle"] <- 2
+meta.ps.prev.intes.log$gut.order[meta.ps.prev.intes.log$Region == "distal"] <- 3
+class(meta.ps.prev.intes.log$gut.order)
+```
+
+```{r}
+# Interaction of Region and Regime
+anosim(dist.bray.intes.log, grouping = interaction(meta.ps.prev.intes.log$Regime, meta.ps.prev.intes.log$Region))
+```
+
+
+```{r}
+# gut MMV subset ----
+ps.prev.intes.MMV <- subset_samples(ps.prev.intes, sample == "gut" & Regime == "MMV")
+                                   
+ps.prev.intes.MMV <- prune_taxa(taxa_sums(ps.prev.intes.MMV) > 0, ps.prev.intes.MMV)                                  
+ps.prev.intes.MMV.log <- transform_sample_counts(ps.prev.intes.MMV, function(x) log(1 + x))
+out.brayPCoA.intes.MMV.log <- ordinate(ps.prev.intes.MMV.log, method = "PCoA", distance = "bray")
+plot_ordination(ps.prev.intes.MMV.log, out.brayPCoA.intes.MMV.log, color = "Region") +
+  theme_classic() +
+  #labs(title = "PCoA of Bray Curtis Distances of MMV regime") +
+  theme(strip.background = element_blank()) +
+  coord_equal() +
+  geom_point(size = 3.5, aes(shape = Regime)) +  # Set the shape aesthetic
+  scale_color_manual(values = c("#FF7F00", "#6A3D9A", "#A6CEE3")) +
+  scale_shape_manual(values = c(16, 3))  +
+  labs(shape = "Regime") + # Set the shape values
+  #scale_color_viridis_d(option = "C") #+
+  stat_ellipse(level = 0.75)
+
+#ggsave("figures/fig5a.tiff", height = 5, width = 10, units = "in", dpi = 300, compression = "lzw")
+```
+
+```{r}
+# gut VMV subset ----
+ps.prev.intes.VMV <- subset_samples(ps.prev.intes, sample == "gut" & Regime == "VMV")
+
+ps.prev.intes.VMV <- prune_taxa(taxa_sums(ps.prev.intes.VMV) > 0, ps.prev.intes.VMV)                                  
+ps.prev.intes.VMV.log <- transform_sample_counts(ps.prev.intes.VMV, function(x) log(1 + x))
+out.brayPCoA.intes.VMV.log <- ordinate(ps.prev.intes.VMV.log, method = "PCoA", distance = "bray")
+plot_ordination(ps.prev.intes.VMV.log, out.brayPCoA.intes.VMV.log, color = "Region") +
+  theme_classic() +
+  #labs(title = "PCoA of Bray Curtis Distances of VMV regime") +
+  theme(strip.background = element_blank()) +
+  coord_equal() +
+  geom_point(size = 3.5, aes(shape = Regime)) +  # Set the shape aesthetic
+  scale_color_manual(values = c("#FF7F00", "#6A3D9A", "#A6CEE3")) +
+  scale_shape_manual(values = c(3, 16))  +
+  labs(shape = "Regime") + # Set the shape values
+#scale_color_viridis_d(option = "C") #+
+  stat_ellipse(level = 0.75)
+
+#ggsave("figures/fig5b.tiff", height = 5, width = 10, units = "in", dpi = 300, compression = "lzw")
+```
+
+```{r}
+# global stat
+# MMV
+meta.ps.prev.intes.MMV.log <- as(sample_data(ps.prev.intes.MMV.log), "data.frame")
+dist.bray.intes.MMV.log <- phyloseq::distance(ps.prev.intes.MMV.log, method = "bray")
+dist.bray.intes.MMV.log.anosim <- anosim(dist.bray.intes.MMV.log, meta.ps.prev.intes.MMV.log$Region_Regime)
+summary.output <- capture.output(summary(dist.bray.intes.MMV.log.anosim))
+summary.output
+# VMV
+meta.ps.prev.intes.VMV.log <- as(sample_data(ps.prev.intes.VMV.log), "data.frame")
+dist.bray.intes.VMV.log <- phyloseq::distance(ps.prev.intes.VMV.log, method = "bray")
+dist.bray.intes.VMV.log.anosim <- anosim(dist.bray.intes.VMV.log, meta.ps.prev.intes.VMV.log$Region_Regime)
+summary.output <- capture.output(summary(dist.bray.intes.VMV.log.anosim))
+summary.output
+```
+
+
+```{r}
+# pairwise stat
+
+# subset for each pairwise comparison
+ps.prev.intes.py.md.MMV <- subset_samples(ps.prev.intes, Region_Regime == "pyloric.MMV" | 
+                                            Region_Regime == "middle.MMV")
+ps.prev.intes.py.md.MMV <- prune_taxa(taxa_sums(ps.prev.intes.py.md.MMV) > 0, ps.prev.intes.py.md.MMV) 
+
+ps.prev.intes.md.ds.MMV <- subset_samples(ps.prev.intes, Region_Regime == "middle.MMV" | 
+                                            Region_Regime == "distal.MMV")
+ps.prev.intes.md.ds.MMV <- prune_taxa(taxa_sums(ps.prev.intes.md.ds.MMV) > 0, ps.prev.intes.md.ds.MMV) 
+
+ps.prev.intes.ds.py.MMV <- subset_samples(ps.prev.intes, Region_Regime == "pyloric.MMV" | 
+                                            Region_Regime == "distal.MMV")
+ps.prev.intes.ds.py.MMV <- prune_taxa(taxa_sums(ps.prev.intes.ds.py.MMV) > 0, ps.prev.intes.ds.py.MMV) 
+
+ps.prev.intes.py.md.VMV <- subset_samples(ps.prev.intes, Region_Regime == "pyloric.VMV" | 
+                                       Region_Regime == "middle.VMV")
+ps.prev.intes.py.md.VMV <- prune_taxa(taxa_sums(ps.prev.intes.py.md.VMV) > 0, ps.prev.intes.py.md.VMV) 
+
+ps.prev.intes.md.ds.VMV <- subset_samples(ps.prev.intes, Region_Regime == "middle.VMV" | 
+                                         Region_Regime == "distal.VMV")
+ps.prev.intes.md.ds.VMV <- prune_taxa(taxa_sums(ps.prev.intes.md.ds.VMV) > 0, ps.prev.intes.md.ds.VMV) 
+
+ps.prev.intes.ds.py.VMV <- subset_samples(ps.prev.intes, Region_Regime == "pyloric.VMV" | 
+                                        Region_Regime == "distal.VMV")
+ps.prev.intes.ds.py.VMV <- prune_taxa(taxa_sums(ps.prev.intes.ds.py.VMV) > 0, ps.prev.intes.ds.py.VMV) 
+```
+MMV
+```{r}
+# pyloric vs middle (MMV)
+ps.prev.intes.py.md.MMV.log <- transform_sample_counts(ps.prev.intes.py.md.MMV, function(x) log(1 + x))
+dist.bray.intes.py.md.MMV.log <- phyloseq::distance(ps.prev.intes.py.md.MMV.log, method = "bray")
+anosim(dist.bray.intes.py.md.MMV.log, sample_data(ps.prev.intes.py.md.MMV.log)$Region_Regime)
+```
+
+```{r}
+# middle vs distal (MMV) 
+ps.prev.intes.md.ds.MMV.log <- transform_sample_counts(ps.prev.intes.md.ds.MMV, function(x) log(1 + x))
+dist.bray.intes.md.ds.MMV.log <- phyloseq::distance(ps.prev.intes.md.ds.MMV.log, method = "bray")
+anosim(dist.bray.intes.md.ds.MMV.log, sample_data(ps.prev.intes.md.ds.MMV.log)$Region_Regime)
+```
+
+```{r}
+# distal vs pyloric (MMV)
+ps.prev.intes.ds.py.MMV.log <- transform_sample_counts(ps.prev.intes.ds.py.MMV, function(x) log(1 + x))
+dist.bray.intes.ds.py.MMV.log <- phyloseq::distance(ps.prev.intes.ds.py.MMV.log, method = "bray")
+anosim(dist.bray.intes.ds.py.MMV.log, sample_data(ps.prev.intes.ds.py.MMV.log)$Region_Regime)
+```
+VMV
+```{r}
+# pyloric vs middle (VMV)
+ps.prev.intes.py.md.VMV.log <- transform_sample_counts(ps.prev.intes.py.md.VMV, function(x) log(1 + x))
+dist.bray.intes.py.md.VMV.log <- phyloseq::distance(ps.prev.intes.py.md.VMV.log, method = "bray")
+anosim(dist.bray.intes.py.md.VMV.log, sample_data(ps.prev.intes.py.md.VMV.log)$Region_Regime)
+```
+
+```{r}
+# middle vs distal (VMV)
+ps.prev.intes.md.ds.VMV.log <- transform_sample_counts(ps.prev.intes.md.ds.VMV, function(x) log(1 + x))
+dist.bray.intes.md.ds.VMV.log <- phyloseq::distance(ps.prev.intes.md.ds.VMV.log, method = "bray")
+anosim(dist.bray.intes.md.ds.VMV.log, sample_data(ps.prev.intes.md.ds.VMV.log)$Region_Regime)
+```
+
+```{r}
+# distal vs pyloric (VMV)
+ps.prev.intes.ds.py.VMV.log <- transform_sample_counts(ps.prev.intes.ds.py.VMV, function(x) log(1 + x))
+dist.bray.intes.ds.py.VMV.log <- phyloseq::distance(ps.prev.intes.ds.py.VMV.log, method = "bray")
+anosim(dist.bray.intes.ds.py.VMV.log, sample_data(ps.prev.intes.ds.py.VMV.log)$Region_Regime)
+```
+
+```{r}
+# i tried without log transformation and visualisation was crap, all condensed together and not seperate from each other 
+# i also tried log10 transformation and no difference in visualisation excpet it is on the other side of the figure 
+# i also tried the rarefied and I found no difference or whatsoever, kind of tranformation you choose depends on your biological data.
+```
+
+
+```{r}
+sessionInfo()
+```
+

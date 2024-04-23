@@ -1,0 +1,793 @@
+---
+title: "STEP 2-8 DADA2 denoising and number of reads"
+author: "Marwa Tawfik"
+summary: "NP_intesParts_ampliseq"
+Platform: "R version 4.1.0 (2021-05-18) -- Camp Pontanezen; x86_64-conda-linux-gnu (64-bit)"
+date: "22 October 2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#STEP 2-8 DADA2 denoising
+
+```{r}
+# STEP 2. Learn the Error Model ----
+errF <- learnErrors(filtFs, multithread = TRUE, MAX_CONSIST = 25)
+# 128493750 total bases in 513975 reads from 4 samples will be used for learning the error rates.
+
+errR <- learnErrors(filtRs, multithread = TRUE, MAX_CONSIST = 25)
+# 113074500 total bases in 513975 reads from 4 samples will be used for learning the error rates.
+
+# errF  #to see all 
+head(errF) #view first 6 
+# errR 
+
+write.table(errF, file = "tables/FerrorModel.txt", sep = "\t")
+write.table(errR, file = "tables/RerrorModel.txt", sep = "\t")
+```
+
+
+```{r}
+# Plot the error model and check convergence from the expected line 
+#The error rates for each possible transition (eg. A->C, A->G,...) are shown. Points are the observed error rates for each 
+#consensus qualtiy score. The black line shows the estimated error rates after convergence. THe red line shows the error rates
+#expected under the nomical definiiton of the Q-value. Here the black line (the estimated rates) fits the observed rates well,
+#and the error rates  drop with increased quality as expected. Everything looks reasonable and we proceed with confidence.
+#if using this workflow on your own data: Parameter learning is computationally intensive, so by default the learnErrors function
+#uses only a subset of the data (the first 1M reads). If the plotted error model doesn't look like a good fit, try increasing 
+#the nreads parameter to see if the fit improves. 
+
+# Note: shift + conrtol + c  --> on a selected lines to be as a comment 
+
+plotErrors(errF, nominalQ = TRUE)
+ggsave("figures/FerrorPlot.tiff", height = 7, width = 15)
+
+plotErrors(errR, nominalQ = TRUE)
+ggsave("figures/RerrorPlot.tiff", height = 7, width = 15)
+#for both commands (plotErrors & ggsave) and for both F and R it gave the following error 
+# Warning messages:
+# 1: Transformation introduced infinite values in continuous y-axis 
+# 2: Transformation introduced infinite values in continuous y-axis
+
+#the following should end up giving zeros 
+dada2:::checkConvergence(errF)
+# [1] 59.540082331  0.461681305  0.031569530  0.004231048  0.000000000
+
+dada2:::checkConvergence(errR)
+# [1] 65.169974231  0.585970857  0.044284216  0.004139182  0.000000000
+```
+
+
+```{r}
+# STEP 3. Dereplicate ---- 
+# to be speed up the computation to not work on single reads?
+# to combine identiical sequences into a unique sequence 
+# sample.names <- readRDS("Robjects/sample.names.rds")
+derepFs <- derepFastq(filtFs)
+names(derepFs) <- sample.names
+
+derepRs <- derepFastq(filtRs)
+names(derepRs) <- sample.names
+```
+
+
+```{r}
+# STEP 4. Sample inference ----
+dadaFs <- dada(derepFs, err=errF)
+dadaRs <- dada(derepRs, err=errR)
+
+saveRDS(dadaFs, file = "Robjects/dadaFs.rds")
+saveRDS(dadaRs, file = "Robjects/dadaRs.rds")
+
+#inspect the returned data-class object
+dadaFs[[1]]
+# dada-class: object describing DADA2 denoising results
+#703 sequence variants were inferred from 9507 input unique sequences.
+# Key parameters: OMEGA_A = 1e-40, OMEGA_C = 1e-40, BAND_SIZE = 16
+dadaRs[[1]]
+# dada-class: object describing DADA2 denoising results
+# 631 sequence variants were inferred from 11270 input unique sequences.
+# Key parameters: OMEGA_A = 1e-40, OMEGA_C = 1e-40, BAND_SIZE = 16
+```
+
+
+```{r}
+# STEP 5. Merge Paired Reads ----
+mergers <- mergePairs(dadaFs, derepFs, dadaRs, derepRs, verbose = TRUE)
+save(mergers, file = "Robjects/mergers.Rdata")
+saveRDS(mergers, file = "Robjects/mergers.rds") #better for saving: https://fromthebottomoftheheap.net/2012/04/01/saving-and-loading-r-objects/
+
+# mergers <- readRDS("Robjects/mergers.rds") #incase need to read to your R env from a folder/file
+
+
+#inspect the merger data.frame from the 9th sample to see matched number (nucleotides number attached from forward and reverse reads)
+head(mergers[[9]])
+                                                                                                                  # sequence
+# 1 TAGGGAATCTTCGGCAATGGACGCAAGTCTGACCGAGCAACGCCGCGTGAGTGAAGAAGGTTTTCGGATCGTAAAACTCTGTTGTTAGAGAAGAACAAGGATGAGAGTGGAAAGTTCATCCCTTGACGGTATCTAACCAGAAAGCCACGGCTAACTACGTGCCAGCAGCCGCGGTAATACGTAGGTGGCAAGCGTTGTCCGGATTTATTGGGCGTAAAGCGAGCGCAGGCGGTCTTTTAAGTCTGATGTGAAAGCCCCCGGCTTAACCGGGGAGGGTCATTGGAAACTGGGAGACTTGAGTGCAGAAGAGGAAAGCGGAATTCCATGTGTAGCGGTGAAATGCGTAGATATATGGAGGAACACCAGTGGCGAAGGCGGCTTTCTGGTCTGTAACTGACGCTGAGGCTCGAAAGCGTGGGGAGCAAACA
+# 2  TAGGGAATCTTCCACAATGGGCGAAAGCCTGATGGAGCAACGCCGCGTGAGTGAAGAAGGGTTTCGGCTCGTAAAACTCTGTTGTTAAAGAAGAACGTATCTGATAGTAACTGATCAGGTAGTGACGGTATTTAACCAGAAAGCCACGGCTAACTACGTGCCAGCAGCCGCGGTAATACGTAGGTGGCAAGCGTTATCCGGATTTATTGGGCGTAAAGGGAGTGCAGGCGGTTATTTAAGTCTGATGTGAAAGCCTTCGGCTTAACCGGAGAAGGGCATCGGAAACTGGATAACTTGAGTACAGAAGAGGGTAGTGGAACTCCATGTGTAGCGGTGGAATGCGTAGATATATGGAAGAACACCAGTGGCGAAGGCGGCTACCTGGTCTGTAACTGACGCTGAGGCTCGAAAGCATGGGTAGCAAACA
+# 3  TGGGGAATATTGCACAATGGGGGAAACCCTGATGCAGCCATGCCGCGTGTGTGAAGAAGGCCTTCGGGTTGTAAAGCACTTTCAGCGAGGAGGAAAGGTTGGTAGCTAATAACTGCCAACTGTGACGTTACTCGCAGAAGAAGCACCGGCTAACTCCGTGCCAGCAGCCGCGGTAATACGGAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGCACGCAGGCGGTTGGATAAGTTAGATGTGAAAGCCCCGGGCTCAACCTGGGAATTGCATTTAAAACTGTCCAGCTAGAGTCTTGTAGAGGGGGGTAGAATTCCAGGTGTAGCGGTGAAATGCGTAGAGATCTGGAGGAATACCGGTGGCGAAGGCGGCCCCCTGGACAAAGACTGACGCTCAGGTGCGAAAGCGTGGGGAGCAAACA
+# 4                            TAGGGAATATTGCACAATGGAGGAAACTCTGATGCAGCGACGTCGCGTGAGGGAAGAAGGTTTTCGGATTGTAAACCTCTGTCTTTGGTGAAGAAAATGACGGTAACCAAAGAGGAAGCCACGGCTAACTACGTGCCAGCAGCCGCGGTAATACGTAGGTGGCAAGCGTTGTCCGGAATTACTGGGTGTAAAGGGAGCGTAGGCGGGGGAATAAGTTGAATGTTAAAACTATCGGCTCAACCGATAGCAGCGTTCAAAACTATTTCTCTTGAGTGGAGTAGAGGTAAGCGGAATTCCTAGTGTAGCGGTGAAATGCGTAGATATTAGGAGGAACACCAGTGGCGAAGGCGGTTTACTGGGCTCTAACTGACGCTGAGGCTCGAAAGCGTGGGTAGCAAACA
+# 5  TGGGGAATATTGGACAATGGGCGAAAGCCTGATCCAGCCATGCCGCGTGTGTGAAGAAGGTCTTCGGATTGTAAAGCACTTTAAGTTGGGAGGAAGGGCAGTAAATTAATACTTTGCTGTTTTGACGTTACCGACAGAATAAGCACCGGCTAACTCTGTGCCAGCAGCCGCGGTAATACAGAGGGTGCAAGCGTTAATCGGAATTACTGGGCGTAAAGCGCGCGTAGGTGGTTCGTTAAGTTGGATGTGAAATCCCCGGGCTCAACCTGGGAACTGCATTCAAAACTGACGAGCTAGAGTATGGTAGAGGGTGGTGGAATTTCCTGTGTAGCGGTGAAATGCGTAGATATAGGAAGGAACACCAGTGGCGAAGGCGACCACCTGGACTGATACTGACACTGAGGTGCGAAAGCGTGGGGAGCAAACA
+# 7                                                                                                                                                                       GCCTACAAGAAATTAAACCGCTCTTTCCAGGAATAATTATCCAACTAAGATTTCTGTGGACAAGCGATACAAATACCCAGACAGTGTCTTTTAAGAGCCCAGATAACAATGTTGTCAGTATGTATGCACAATGCTCGCCCTCAAATAAAGATCACGTGGTAGCAGATGAGATGCACAGTAAGAGATAAATTTAAAAGTATTGGCCCTCCAAGACAATTTGCGATTTTTTACTCAAATCATTAATTTGATACCCATTCTCATC
+#   abundance forward reverse nmatch nmismatch nindel prefer accept
+# 1       411       1       2     42         0      0      1   TRUE
+# 2       321       2       3     43         0      0      1   TRUE
+# 3       311       3       1     43         0      0      2   TRUE
+# 4       185       5       4     69         0      0      1   TRUE
+# 5       148       4       5     43         0      0      1   TRUE
+# 7       103       7       6    208         0      0      2   TRUE
+```
+
+
+```{r}
+# STEP 6. Construct sequence table ----
+seqtab <- makeSequenceTable(mergers)
+
+dim(seqtab)
+# [1] 137 14413
+
+str(seqtab)
+
+# inspect distribution of sequence lengths
+seqtable <- table(nchar(getSequences(seqtab)))
+
+write.table(seqtable, file = "tables/seqtab.txt", sep = "\t")
+saveRDS(seqtable, file = "Robjects/seqtable.rds")
+```
+
+
+```{r}
+# historgram 
+
+tiff("figures/distSeqLengthHist.tiff")
+
+hist(nchar(getSequences(seqtab)), main="Distribution of sequence lengths",
+     xlab ="Sequence lengths (bp)",
+     xlim= c(250,450))
+
+dev.off()
+# X11cairo 
+# 2 
+
+# as amplicon size is known to be 444bp so
+# remove others away from amplicon size (bp) excpet the two for forward and reverse 
+seqtab2 <- seqtab[,nchar(colnames(seqtab)) %in% seq(390, 450)]
+dim(seqtab2)
+# [1] 137 9553
+
+write.table(seqtab2, file = "tables/seqtab2.txt", sep = "\t")
+saveRDS(seqtab2, file = "Robjects/seqtab2.rds")
+```
+
+
+```{r}
+# STEP 7. Remove chimeras ----
+seqtab.nochim2 <- removeBimeraDenovo(seqtab2, method="consensus", verbose=TRUE)
+# Identified 1698 bimeras out of 7781 input sequences.
+
+dim(seqtab.nochim2)
+# [1] 137 7483
+
+sum(seqtab.nochim2)/sum(seqtab2) #see the percent after removal of chimera (above 90% is ok but still acc. to dataset)
+# [1] 0.9963121
+
+write.table(seqtab.nochim2, file = "tables/seqtab.nochim2.txt", sep = "\t")
+saveRDS(seqtab.nochim2, file = "Robjects/seqtab.nochim2.rds")
+# seqtab.nochim2 <- readRDS("Robjects/seqtab.nochim2.rds")
+```
+
+
+```{r}
+# STEP 8. Track reads ----
+getN <- function(x) sum(getUniques(x))
+track <- cbind(out, sapply(dadaFs, getN), sapply(dadaRs, getN), sapply(mergers, getN), rowSums(seqtab.nochim2))
+colnames(track) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nochim")
+rownames(track) <- sample.names
+head(track)
+           # input filtered denoisedF denoisedR merged nochim
+# distal-MMV-T1-Rep1  43904    28324     28093     28069  27473  26803
+# distal-MMV-T1-Rep2 258234   219699    219470    219459 219229 219062
+# distal-MMV-T1-Rep3  78006    65961     65820     65821  65678  65540
+# distal-MMV-T1-Rep4  25087     4271      3605      3584   2205   1098
+# distal-MMV-T1-Rep5  31420    15283     14942     14906  14557  14137
+# distal-MMV-T1-Rep6  92101    77445     77110     77084  76606  76406
+
+write.table(track, file = "tables/readInsAndreadOuts.txt", sep = "\t")
+```
+
+
+```{r}
+# number of reads ----
+# importing data 
+# nutriProg (intes + feed + water)
+nutriprog <- read.table("tables/STEP 2-8/readInsAndreadOuts_nutriprog.txt", header = TRUE)
+
+# TOTAL (ALL except feed.M)
+total <- read.table("tables/STEP 2-8/readInsAndreadOuts_total.txt", header = TRUE)
+
+# similarly for intes only 
+intes <- read.table("tables/STEP 2-8/readInsAndreadOuts_intestine.txt", header = TRUE)
+
+# similarly for pyloric only 
+pyloric <- read.table("tables/STEP 2-8/readInsAndreadOuts_pyloric.txt", header = TRUE)
+
+# similarly for middle only 
+middle <- read.table("tables/STEP 2-8/readInsAndreadOuts_middle.txt", header = TRUE)
+
+# similarly for distal only 
+distal <- read.table("tables/STEP 2-8/readInsAndreadOuts_distal.txt", header = TRUE)
+
+# similarly for water only 
+water <- read.table("tables/STEP 2-8/readInsAndreadOuts_water.chall.txt", header = TRUE)
+
+# similarly for feed only 
+feed <- read.table("tables/STEP 2-8/readInsAndreadOuts_feed.txt", header = TRUE)
+
+# similarly for control-+ only  
+control <- read.table("tables/STEP 2-8/readInsAndreadOuts_control-+.txt", header = TRUE)
+
+is.data.frame(feed) #sanity check for any of these
+# [1] TRUE
+```
+
+```{r}
+# read per sample statistics ----
+summary(total)
+ #     input           filtered        denoisedF        denoisedR          merged           nochim      
+ # Min.   :   176   Min.   :    14   Min.   :     2   Min.   :     2   Min.   :     2   Min.   :     2  
+ # 1st Qu.: 18417   1st Qu.:  4778   1st Qu.:  4086   1st Qu.:  4143   1st Qu.:  2828   1st Qu.:  1526  
+ # Median : 33573   Median :  8106   Median :  7740   Median :  7716   Median :  6871   Median :  4263  
+ # Mean   : 61072   Mean   : 35371   Mean   : 34825   Mean   : 34831   Mean   : 33829   Mean   : 32632  
+ # 3rd Qu.: 77622   3rd Qu.: 36427   3rd Qu.: 36066   3rd Qu.: 35978   3rd Qu.: 34807   3rd Qu.: 32069  
+ # Max.   :323568   Max.   :280034   Max.   :279836   Max.   :279868   Max.   :279572   Max.   :279357 
+
+summary(intes)
+     # input           filtered        denoisedF        denoisedR          merged           nochim      
+ # Min.   :   176   Min.   :    14   Min.   :     2   Min.   :     2   Min.   :     2   Min.   :     2  
+ # 1st Qu.: 17170   1st Qu.:  4369   1st Qu.:  3924   1st Qu.:  3928   1st Qu.:  2752   1st Qu.:  1474  
+ # Median : 31696   Median :  7322   Median :  6530   Median :  6554   Median :  5232   Median :  3819  
+ # Mean   : 53450   Mean   : 29018   Mean   : 28478   Mean   : 28467   Mean   : 27506   Mean   : 26358  
+ # 3rd Qu.: 65322   3rd Qu.: 24362   3rd Qu.: 23882   3rd Qu.: 23841   3rd Qu.: 23130   3rd Qu.: 22454  
+ # Max.   :323568   Max.   :280034   Max.   :279836   Max.   :279868   Max.   :279572   Max.   :279357 
+
+summary(pyloric)
+ #     input           filtered       denoisedF       denoisedR           merged            nochim     
+ # Min.   :   176   Min.   :   14   Min.   :    2   Min.   :    2.0   Min.   :    2.0   Min.   :    2  
+ # 1st Qu.:  3764   1st Qu.:  553   1st Qu.:  481   1st Qu.:  470.5   1st Qu.:  434.5   1st Qu.:  265  
+ # Median : 14586   Median : 3912   Median : 3297   Median : 3261.5   Median : 2227.0   Median : 1190  
+ # Mean   : 26689   Mean   : 5428   Mean   : 5102   Mean   : 5085.1   Mean   : 4447.4   Mean   : 3577  
+ # 3rd Qu.: 32466   3rd Qu.: 7266   3rd Qu.: 6986   3rd Qu.: 7009.2   3rd Qu.: 5603.8   3rd Qu.: 3945  
+ # Max.   :140606   Max.   :24221   Max.   :23824   Max.   :23779.0   Max.   :23083.0   Max.   :22205 
+
+summary(middle)
+ #    input           filtered        denoisedF        denoisedR          merged           nochim      
+ # Min.   : 13195   Min.   :  2830   Min.   :  2332   Min.   :  2308   Min.   :  1769   Min.   :  1054  
+ # 1st Qu.: 19694   1st Qu.:  5664   1st Qu.:  4863   1st Qu.:  4818   1st Qu.:  3813   1st Qu.:  2368  
+ # Median : 32878   Median : 12470   Median : 11552   Median : 11468   Median :  9834   Median :  7986  
+ # Mean   : 58150   Mean   : 31132   Mean   : 30521   Mean   : 30505   Mean   : 29540   Mean   : 28170  
+ # 3rd Qu.: 61124   3rd Qu.: 26259   3rd Qu.: 25482   3rd Qu.: 25458   3rd Qu.: 24906   3rd Qu.: 24433  
+ # Max.   :323568   Max.   :280034   Max.   :279836   Max.   :279868   Max.   :279572   Max.   :279357 
+
+summary(distal)
+ #     input           filtered        denoisedF        denoisedR          merged           nochim      
+ # Min.   : 17198   Min.   :  2457   Min.   :  2138   Min.   :  2112   Min.   :  1698   Min.   :   961  
+ # 1st Qu.: 29466   1st Qu.:  6908   1st Qu.:  6052   1st Qu.:  6008   1st Qu.:  4562   1st Qu.:  2907  
+ # Median : 44446   Median : 22065   Median : 21569   Median : 21552   Median : 18854   Median : 17202  
+ # Mean   : 75510   Mean   : 50495   Mean   : 49809   Mean   : 49812   Mean   : 48529   Mean   : 47327  
+ # 3rd Qu.: 85116   3rd Qu.: 68677   3rd Qu.: 68499   3rd Qu.: 68515   3rd Qu.: 68324   3rd Qu.: 68215  
+ # Max.   :286403   Max.   :246966   Max.   :246804   Max.   :246848   Max.   :246645   Max.   :246537  
+
+summary(water)
+ #    input           filtered        denoisedF        denoisedR          merged           nochim      
+ # Min.   : 55616   Min.   : 41113   Min.   : 40766   Min.   : 40823   Min.   : 40239   Min.   : 40058  
+ # 1st Qu.: 78487   1st Qu.: 57201   1st Qu.: 56797   1st Qu.: 56888   1st Qu.: 56054   1st Qu.: 55858  
+ # Median : 85940   Median : 63302   Median : 62976   Median : 63075   Median : 62368   Median : 62188  
+ # Mean   :149928   Mean   :110634   Mean   :110083   Mean   :110266   Mean   :109113   Mean   :108665  
+ # 3rd Qu.:243701   3rd Qu.:179751   3rd Qu.:178995   3rd Qu.:179282   3rd Qu.:177659   3rd Qu.:176932  
+ # Max.   :299781   Max.   :222355   Max.   :221378   Max.   :221778   Max.   :219666   Max.   :218630  
+
+summary(feed)
+ #     input           filtered        denoisedF        denoisedR          merged           nochim
+ # Min.   :129146   Min.   : 90615   Min.   : 89887   Min.   : 90155   Min.   : 87897   Min.   : 83555
+ # 1st Qu.:149070   1st Qu.:106686   1st Qu.:105954   1st Qu.:106204   1st Qu.:104094   1st Qu.: 99976
+ # Median :168993   Median :122756   Median :122021   Median :122252   Median :120292   Median :116397
+ # Mean   :157768   Mean   :113553   Mean   :112817   Mean   :113046   Mean   :110899   Mean   :106442
+ # 3rd Qu.:172078   3rd Qu.:125022   3rd Qu.:124282   3rd Qu.:124492   3rd Qu.:122400   3rd Qu.:117886
+ # Max.   :175164   Max.   :127289   Max.   :126544   Max.   :126731   Max.   :124507   Max.   :119375
+```
+
+```{r}
+# nutriprog
+
+# total number of reads ----
+sum(nutriprog[,1]) #input
+sum(nutriprog[,2]) #filtered
+sum(nutriprog[,3]) #denoisedF
+sum(nutriprog[,4]) #denoisedR
+sum(nutriprog[,5]) #merged
+sum(nutriprog[,6]) #nochim
+
+# [1] 7676016
+# [1] 4529641
+# [1] 4463618
+# [1] 4465127
+# [1] 4342602
+# [1] 4190709
+```
+
+
+```{r}
+# mean number of reads ----
+mean(nutriprog[,1]) #input
+mean(nutriprog[,2]) #filtered
+mean(nutriprog[,3]) #denoisedF
+mean(nutriprog[,4]) #denoisedR
+mean(nutriprog[,5]) #merged
+mean(nutriprog[,6]) #nochim
+
+# [1] 63966.8
+# [1] 37747.01
+# [1] 37196.82
+# [1] 37209.39
+# [1] 36188.35
+# [1] 34922.57
+
+
+standard_error <- function(x) sd(x) / sqrt(length(x)) # Create own function
+x <- nutriprog[,1] #input
+standard_error(x)
+x <- nutriprog[,2] #filtered
+standard_error(x)
+x <- nutriprog[,3] #denoisedF
+standard_error(x)
+x <- nutriprog[,4] #denoisedR
+standard_error(x)
+x <- nutriprog[,5] #merged
+standard_error(x)
+x <- nutriprog[,6] #nochim
+standard_error(x)
+
+# [1] 6770.722
+# [1] 5531.878
+# [1] 5531.785
+# [1] 5536.765
+# [1] 5532.391
+# [1] 5523.739
+```
+
+
+```{r}
+# total
+
+# total number of reads ----
+sum(total[,1]) #input
+sum(total[,2]) #filtered
+sum(total[,3]) #denoisedF
+sum(total[,4]) #denoisedR
+sum(total[,5]) #merged
+sum(total[,6]) #nochim
+# [1] 7145433
+# [1] 4138422
+# [1] 4074531
+# [1] 4075212
+# [1] 3957992
+# [1] 3817989
+```
+
+
+```{r}
+# mean number of reads ----
+mean(total[,1]) #input
+mean(total[,2]) #filtered
+mean(total[,3]) #denoisedF
+mean(total[,4]) #denoisedR
+mean(total[,5]) #merged
+mean(total[,6]) #nochim
+# [1] 61072.08
+# [1] 35371.13
+# [1] 34825.05
+# [1] 34830.87
+# [1] 33828.99
+# [1] 32632.38
+
+standard_error <- function(x) sd(x) / sqrt(length(x)) # Create own function
+x <- total[,1] #input
+standard_error(x)
+x <- total[,2] #filtered
+standard_error(x)
+x <- total[,3] #denoisedF
+standard_error(x)
+x <- total[,4] #denoisedR
+standard_error(x)
+x <- total[,5] #merged
+standard_error(x)
+x <- total[,6] #nochim
+standard_error(x)
+# [1] 6504.848
+# [1] 5345.599
+# [1] 5347.354
+# [1] 5351.252
+# [1] 5353.02
+# [1] 5364.578
+```
+
+
+```{r}
+# intes
+sum(intes[,1]) #input
+sum(intes[,2]) #filtered
+sum(intes[,3]) #denoisedF
+sum(intes[,4]) #denoisedR
+sum(intes[,5]) #merged
+sum(intes[,6]) #nochim
+
+# [1] 5772562
+# [1] 3133955
+# [1] 3075579
+# [1] 3074480
+# [1] 2970616
+# [1] 2846672
+
+mean(intes[,1]) #input
+mean(intes[,2]) #filtered
+mean(intes[,3]) #denoisedF
+mean(intes[,4]) #denoisedR
+mean(intes[,5]) #merged
+mean(intes[,6]) #nochim
+
+# [1] 53449.65
+# [1] 29018.1
+# [1] 28477.58
+# [1] 28467.41
+# [1] 27505.7
+# [1] 26358.07
+
+standard_error <- function(x) sd(x) / sqrt(length(x)) # Create own function
+x <- intes[,1] #input
+standard_error(x)
+x <- intes[,2] #filtered
+standard_error(x)
+x <- intes[,3] #denoisedF
+standard_error(x)
+x <- intes[,4] #denoisedR
+standard_error(x)
+x <- intes[,5] #merged
+standard_error(x)
+x <- intes[,6] #nochim
+standard_error(x)
+
+# [1] 6068.409
+# [1] 5046.11
+# [1] 5051.339
+# [1] 5052.699
+# [1] 5065.948
+# [1] 5090.601
+```
+
+
+```{r}
+# pyloric
+sum(pyloric[,1]) #input
+sum(pyloric[,2]) #filtered
+sum(pyloric[,3]) #denoisedF
+sum(pyloric[,4]) #denoisedR
+sum(pyloric[,5]) #merged
+sum(pyloric[,6]) #nochim
+
+# [1] 960813
+# [1] 195400
+# [1] 183671
+# [1] 183064
+# [1] 160107
+# [1] 128758
+
+mean(pyloric[,1]) #input
+mean(pyloric[,2]) #filtered
+mean(pyloric[,3]) #denoisedF
+mean(pyloric[,4]) #denoisedR
+mean(pyloric[,5]) #merged
+mean(pyloric[,6]) #nochim
+
+# [1] 26689.25
+# [1] 5427.778
+# [1] 5101.972
+# [1] 5085.111
+# [1] 4447.417
+# [1] 3576.611
+
+standard_error <- function(x) sd(x) / sqrt(length(x)) # Create own function
+x <- pyloric[,1] #input
+standard_error(x)
+x <- pyloric[,2] #filtered
+standard_error(x)
+x <- pyloric[,3] #denoisedF
+standard_error(x)
+x <- pyloric[,4] #denoisedR
+standard_error(x)
+x <- pyloric[,5] #merged
+standard_error(x)
+x <- pyloric[,6] #nochim
+standard_error(x)
+
+
+# [1] 5642.773
+# [1] 1050.397
+# [1] 1031.187
+# [1] 1030.365
+# [1] 1004.363
+# [1] 963.6128
+```
+
+
+```{r}
+# middle
+sum(middle[,1]) #input
+sum(middle[,2]) #filtered
+sum(middle[,3]) #denoisedF
+sum(middle[,4]) #denoisedR
+sum(middle[,5]) #merged
+sum(middle[,6]) #nochim
+
+# [1] 2093407
+# [1] 1120738
+# [1] 1098767
+# [1] 1098194
+# [1] 1063449
+# [1] 1014125
+
+mean(middle[,1]) #input
+mean(middle[,2]) #filtered
+mean(middle[,3]) #denoisedF
+mean(middle[,4]) #denoisedR
+mean(middle[,5]) #merged
+mean(middle[,6]) #nochim
+
+# [1] 58150.19
+# [1] 31131.61
+# [1] 30521.31
+# [1] 30505.39
+# [1] 29540.25
+# [1] 28170.14
+
+standard_error <- function(x) sd(x) / sqrt(length(x)) # Create own function
+x <- middle[,1] #input
+standard_error(x)
+x <- middle[,2] #filtered
+standard_error(x)
+x <- middle[,3] #denoisedF
+standard_error(x)
+x <- middle[,4] #denoisedR
+standard_error(x)
+x <- middle[,5] #merged
+standard_error(x)
+x <- middle[,6] #nochim
+standard_error(x)
+
+# [1] 11721.17
+# [1] 9351.816
+# [1] 9371.954
+# [1] 9374.965
+# [1] 9407.147
+# [1] 9467.62
+```
+
+
+```{r}
+# distal
+sum(distal[,1]) #input
+sum(distal[,2]) #filtered
+sum(distal[,3]) #denoisedF
+sum(distal[,4]) #denoisedR
+sum(distal[,5]) #merged
+sum(distal[,6]) #nochim
+
+# [1] 2718342
+# [1] 1817817
+# [1] 1793141
+# [1] 1793222
+# [1] 1747060
+# [1] 1703789
+
+mean(distal[,1]) #input
+mean(distal[,2]) #filtered
+mean(distal[,3]) #denoisedF
+mean(distal[,4]) #denoisedR
+mean(distal[,5]) #merged
+mean(distal[,6]) #nochim
+
+# [1] 75509.5
+# [1] 50494.92
+# [1] 49809.47
+# [1] 49811.72
+# [1] 48529.44
+# [1] 47327.47
+
+standard_error <- function(x) sd(x) / sqrt(length(x)) # Create own function
+x <- distal[,1] #input
+standard_error(x)
+x <- distal[,2] #filtered
+standard_error(x)
+x <- distal[,3] #denoisedF
+standard_error(x)
+x <- distal[,4] #denoisedR
+standard_error(x)
+x <- distal[,5] #merged
+standard_error(x)
+x <- distal[,6] #nochim
+standard_error(x)
+
+# [1] 11555.12
+# [1] 10759.55
+# [1] 10788.37
+# [1] 10790.58
+# [1] 10859.7
+# [1] 10937.12
+```
+
+
+```{r}
+# water 
+sum(water[,1]) #input
+sum(water[,2]) #filtered
+sum(water[,3]) #denoisedF
+sum(water[,4]) #denoisedR
+sum(water[,5]) #merged
+sum(water[,6]) #nochim
+
+# [1] 899568
+# [1] 663807
+# [1] 660500
+# [1] 661594
+# [1] 654680
+# [1] 651990
+
+mean(water[,1]) #input
+mean(water[,2]) #filtered
+mean(water[,3]) #denoisedF
+mean(water[,4]) #denoisedR
+mean(water[,5]) #merged
+mean(water[,6]) #nochim
+
+# [1] 149928
+# [1] 110634.5
+# [1] 110083.3
+# [1] 110265.7
+# [1] 109113.3
+# [1] 108665
+
+standard_error <- function(x) sd(x) / sqrt(length(x)) # Create own function
+x <- water[,1] #input
+standard_error(x)
+x <- water[,2] #filtered
+standard_error(x)
+x <- water[,3] #denoisedF
+standard_error(x)
+x <- water[,4] #denoisedR
+standard_error(x)
+x <- water[,5] #merged
+standard_error(x)
+x <- water[,6] #nochim
+standard_error(x)
+
+# [1] 46822.69
+# [1] 34683.97
+# [1] 34561.81
+# [1] 34621.71
+# [1] 34344.18
+# [1] 34180.16
+```
+
+
+```{r}
+# feed
+sum(feed[,1]) #input
+sum(feed[,2]) #filtered
+sum(feed[,3]) #denoisedF
+sum(feed[,4]) #denoisedR
+sum(feed[,5]) #merged
+sum(feed[,6]) #nochim
+
+# [1] 473303
+# [1] 340660
+# [1] 338452
+# [1] 339138
+# [1] 332696
+# [1] 319327
+
+mean(feed[,1]) #input
+mean(feed[,2]) #filtered
+mean(feed[,3]) #denoisedF
+mean(feed[,4]) #denoisedR
+mean(feed[,5]) #merged
+mean(feed[,6]) #nochim
+
+# [1] 157767.7
+# [1] 113553.3
+# [1] 112817.3
+# [1] 113046
+# [1] 110898.7
+# [1] 106442.3
+
+standard_error <- function(x) sd(x) / sqrt(length(x)) # Create own function
+x <- feed[,1] #input
+standard_error(x)
+x <- feed[,2] #filtered
+standard_error(x)
+x <- feed[,3] #denoisedF
+standard_error(x)
+x <- feed[,4] #denoisedR
+standard_error(x)
+x <- feed[,5] #merged
+standard_error(x)
+x <- feed[,6] #nochim
+standard_error(x)
+
+# [1] 14421.28
+# [1] 11543.58
+# [1] 11539.27
+# [1] 11518.3
+# [1] 11565.02
+# [1] 11475.91
+```
+
+
+```{r}
+# control
+sum(control[,1]) #input
+sum(control[,2]) #filtered
+sum(control[,3]) #denoisedF
+sum(control[,4]) #denoisedR
+sum(control[,5]) #merged
+sum(control[,6]) #nochim
+
+# [1] 531134
+# [1] 389165
+# [1] 387330
+# [1] 387958
+# [1] 384171
+# [1] 369073
+
+mean(control[,1]) #input
+mean(control[,2]) #filtered
+mean(control[,3]) #denoisedF
+mean(control[,4]) #denoisedR
+mean(control[,5]) #merged
+mean(control[,6]) #nochim
+
+# [1] 106226.8
+# [1] 77833
+# [1] 77466
+# [1] 77591.6
+# [1] 76834.2
+# [1] 73814.6
+
+standard_error <- function(x) sd(x) / sqrt(length(x)) # Create own function
+x <- control[,1] #input
+standard_error(x)
+x <- control[,2] #filtered
+standard_error(x)
+x <- control[,3] #denoisedF
+standard_error(x)
+x <- control[,4] #denoisedR
+standard_error(x)
+x <- control[,5] #merged
+standard_error(x)
+x <- control[,6] #nochim
+standard_error(x)
+
+# [1] 72271.25
+# [1] 53353.09
+# [1] 53091.38
+# [1] 53184.07
+# [1] 52632.68
+# [1] 51217.83
+
+```
+
+
+```{r}
+sessionInfo()
+```

@@ -1,0 +1,325 @@
+---
+title: "Top four phyla"
+author: "Marwa Tawfik"
+date: "07 07 2023"
+output: html_document
+---
+
+Summary
+Proteobacteria and Firmicutes showed the same stat sign as non parametric (without log transformation) 
+Proteobacteria and Firmicutes showed an increasing and drecreasing patterns respectively based on lmp() as the assumptions oflinear models wasn't met 
+Bacteroidota and Actionbacteriota showed no significace (without log transformation) 
+Log transformation showed a worse linear model (although log transformation is known to enhance linearity) and thus stat sig of the linear model is not trustworthy 
+gut order or Region is the same
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# load libraries
+library(tidyverse)
+library(ggplot2)
+library(phyloseq)
+library(lmPerm)
+library(ggpubr)
+```
+
+```{r}
+# import data
+ps.prev.intes <- readRDS("phyobjects/STEP 15/ps.prev.intes.f.rds")
+```
+
+```{r}
+# Top 4 phyla in intestine 
+ps.prev.intes.ra <- transform_sample_counts(ps.prev.intes, function(ASV) ASV/sum(ASV))
+
+ps.prev.phylum.intes <- tax_glom(ps.prev.intes.ra, taxrank = "Phylum")
+
+topPhyl1 <- names(sort(taxa_sums(ps.prev.phylum.intes), decreasing = TRUE))[1:1]
+topPhyl2 <- names(sort(taxa_sums(ps.prev.phylum.intes), decreasing = TRUE))[2:2]
+topPhyl3 <- names(sort(taxa_sums(ps.prev.phylum.intes), decreasing = TRUE))[3:3]
+topPhyl4 <- names(sort(taxa_sums(ps.prev.phylum.intes), decreasing = TRUE))[4:4]
+
+ps.prev.topPhyl1.ra <- prune_taxa(topPhyl1, ps.prev.phylum.intes)
+ps.prev.topPhyl2.ra <- prune_taxa(topPhyl2, ps.prev.phylum.intes)
+ps.prev.topPhyl3.ra <- prune_taxa(topPhyl3, ps.prev.phylum.intes)
+ps.prev.topPhyl4.ra <- prune_taxa(topPhyl4, ps.prev.phylum.intes)
+
+ps.prev.topPhyl1.ra_melt <- ps.prev.topPhyl1.ra %>%
+  psmelt()
+ps.prev.topPhyl2.ra_melt <- ps.prev.topPhyl2.ra %>%
+  psmelt()
+ps.prev.topPhyl3.ra_melt <- ps.prev.topPhyl3.ra %>%
+  psmelt()
+ps.prev.topPhyl4.ra_melt <- ps.prev.topPhyl4.ra %>%
+  psmelt()
+```
+Firmicutes
+```{r}
+# Region are ordinal data
+ps.prev.topPhyl1.ra_melt$gut.order <- NA
+ps.prev.topPhyl1.ra_melt$gut.order[ps.prev.topPhyl1.ra_melt$Region == "pyloric"] <- 1
+ps.prev.topPhyl1.ra_melt$gut.order[ps.prev.topPhyl1.ra_melt$Region == "middle"] <- 2
+ps.prev.topPhyl1.ra_melt$gut.order[ps.prev.topPhyl1.ra_melt$Region == "distal"] <- 3
+class(ps.prev.topPhyl1.ra_melt$gut.order)
+```
+
+```{r}
+plot(lm(Abundance ~ gut.order, ps.prev.topPhyl1.ra_melt))
+# assumption of linear model not met
+```
+
+```{r}
+summary(lmp(Abundance ~ gut.order, ps.prev.topPhyl1.ra_melt))
+```
+Proteobacteria
+```{r}
+# Region are ordinal data
+ps.prev.topPhyl2.ra_melt$gut.order <- NA
+ps.prev.topPhyl2.ra_melt$gut.order[ps.prev.topPhyl2.ra_melt$Region == "pyloric"] <- 1
+ps.prev.topPhyl2.ra_melt$gut.order[ps.prev.topPhyl2.ra_melt$Region == "middle"] <- 2
+ps.prev.topPhyl2.ra_melt$gut.order[ps.prev.topPhyl2.ra_melt$Region == "distal"] <- 3
+class(ps.prev.topPhyl2.ra_melt$gut.order)
+```
+
+```{r}
+plot(lm(Abundance ~ gut.order, ps.prev.topPhyl2.ra_melt))
+# assumption of linear model not met
+```
+
+```{r}
+summary(lmp(Abundance ~ gut.order, ps.prev.topPhyl2.ra_melt))
+```
+Actinobacteriota
+```{r}
+# Region are ordinal data
+ps.prev.topPhyl3.ra_melt$gut.order <- NA
+ps.prev.topPhyl3.ra_melt$gut.order[ps.prev.topPhyl3.ra_melt$Region == "pyloric"] <- 1
+ps.prev.topPhyl3.ra_melt$gut.order[ps.prev.topPhyl3.ra_melt$Region == "middle"] <- 2
+ps.prev.topPhyl3.ra_melt$gut.order[ps.prev.topPhyl3.ra_melt$Region == "distal"] <- 3
+class(ps.prev.topPhyl3.ra_melt$gut.order)
+```
+
+```{r}
+plot(lm(Abundance ~ gut.order, ps.prev.topPhyl3.ra_melt))
+# assumption of linear model not met
+```
+
+```{r}
+summary(lmp(Abundance ~ gut.order, ps.prev.topPhyl3.ra_melt))
+```
+
+Bacteroidota
+```{r}
+# Region are ordinal data
+ps.prev.topPhyl4.ra_melt$gut.order <- NA
+ps.prev.topPhyl4.ra_melt$gut.order[ps.prev.topPhyl4.ra_melt$Region == "pyloric"] <- 1
+ps.prev.topPhyl4.ra_melt$gut.order[ps.prev.topPhyl4.ra_melt$Region == "middle"] <- 2
+ps.prev.topPhyl4.ra_melt$gut.order[ps.prev.topPhyl4.ra_melt$Region == "distal"] <- 3
+class(ps.prev.topPhyl4.ra_melt$gut.order)
+```
+
+```{r}
+plot(lm(Abundance ~ gut.order, ps.prev.topPhyl4.ra_melt))
+# assumption of linear model not met
+# I tried also the Regime as I can't use step() to exclude Regime for example as step() is only when liear model assumption are met
+```
+
+```{r}
+summary(lmp(Abundance ~ gut.order, ps.prev.topPhyl4.ra_melt))
+```
+Firmicutes and Proteobacteria showed increasing and decreasing trend respectively
+
+Trend shown as lm with permutation on figure 
+Firmicutes
+```{r}
+# tiff("figures/fig6a.tiff", height = 5, width = 5, units = "in", res = 300, compression = "lzw")
+plot(Abundance ~ jitter(gut.order, amount = 0.2), data = ps.prev.topPhyl1.ra_melt, xlim = c(0.5, 3.5), axes = F, xlab = "Region", ylab = "Relative Abundance of Firmicutes", pch = 16)
+box()
+axis(2)
+axis(1, at = c(1,2,3), labels = c("pyloric", "middle", "distal"))
+ps.prev.topPhyl1.ra_melt$gut.order <- as.numeric(ps.prev.topPhyl1.ra_melt$Region)
+
+model <- lmp(Abundance ~ gut.order, ps.prev.topPhyl1.ra_melt)
+fakeX <- seq(0, 3.5, by = 0.01)
+predictedY <- predict(model, newdata = data.frame(gut.order = fakeX), se.fit = T)
+lines(fakeX, predictedY$fit, lwd = 3, col = "blue")
+lines(fakeX, predictedY$fit + predictedY$se.fit, lwd = 1, lty = 2, col = "blue")
+lines(fakeX, predictedY$fit - predictedY$se.fit, lwd = 1, lty = 2, col = "blue")
+# dev.off()
+```
+Proteobacteria
+```{r}
+#tiff("figures/fig6b.tiff", height = 5, width = 5, units = "in", res = 300, compression = "lzw")
+plot(Abundance ~ jitter(gut.order, amount = 0.2), data = ps.prev.topPhyl2.ra_melt, xlim = c(0.5, 3.5), axes = F, 
+     xlab = "Region", ylab = "Relative Abundance of Proteobacteria", pch = 16)
+box()
+axis(2)
+axis(1, at = c(1,2,3), labels = c("pyloric", "middle", "distal"))
+ps.prev.topPhyl2.ra_melt$gut.order <- as.numeric(ps.prev.topPhyl2.ra_melt$Region)
+
+model <- lmp(Abundance ~ gut.order, ps.prev.topPhyl2.ra_melt)
+fakeX <- seq(0, 3.5, by = 0.01)
+predictedY <- predict(model, newdata = data.frame(gut.order = fakeX), se.fit = T)
+lines(fakeX, predictedY$fit, lwd = 3, col = "blue")
+lines(fakeX, predictedY$fit + predictedY$se.fit, lwd = 1, lty = 2, col = "blue")
+lines(fakeX, predictedY$fit - predictedY$se.fit, lwd = 1, lty = 2, col = "blue")
+#dev.off()
+```
+
+```{r}
+# 1st 
+ggplot(ps.prev.topPhyl1.ra_melt, aes(x = Region, y = Abundance, color = Regime)) + 
+  geom_point(position = position_jitterdodge(jitter.width = 0.5, dodge.width = 0.7)) +
+  theme_bw() +
+  facet_wrap(~Phylum) +
+  labs(y = "") +
+  #theme(axis.text.x = element_text(angle = 90)) +
+  theme(text = element_text(size = 18), axis.text.x = element_text(size = 16), strip.text = element_text(size = 18)) +
+  scale_color_manual(values = c("#C71585", "#008080"), labels = c("MMV", "VMV")) +
+  guides(color = guide_legend(title = "Regime"))
+#ggsave("figures/fig6c.tiff", height = 4, width = 5, units = "in", dpi = 300, compression = "lzw")
+```
+```{r}
+#2nd
+ggplot(ps.prev.topPhyl2.ra_melt, aes(x = Region, y = Abundance, color = Regime)) + 
+  geom_point(position = position_jitterdodge(jitter.width = 0.5, dodge.width = 0.7)) +
+  theme_bw() +
+  facet_wrap(~Phylum) +
+  labs(y = "") +
+  #theme(axis.text.x = element_text(angle = 90)) +
+  theme(text = element_text(size = 18), axis.text.x = element_text(size = 16), strip.text = element_text(size = 18)) +
+  scale_color_manual(values = c("#C71585", "#008080"), labels = c("MMV", "VMV")) +
+  guides(color = guide_legend(title = "Regime"))
+#ggsave("figures/fig6d.tiff", height = 4, width = 5, units = "in", dpi = 300, compression = "lzw")
+```
+```{r}
+#3nd
+ggplot(ps.prev.topPhyl3.ra_melt, aes(x = Region, y = Abundance, color = Regime)) + 
+  geom_point(position = position_jitterdodge(jitter.width = 0.5, dodge.width = 0.7)) +
+  theme_bw() +
+  facet_wrap(~Phylum) +
+  labs(y = "") +
+  #theme(axis.text.x = element_text(angle = 90)) +
+  theme(text = element_text(size = 18), axis.text.x = element_text(size = 16), strip.text = element_text(size = 18)) +
+  scale_color_manual(values = c("#C71585", "#008080"), labels = c("MMV", "VMV")) +
+  guides(color = guide_legend(title = "Regime"))
+#ggsave("figures/fig6e.tiff", height = 4, width = 5, units = "in", dpi = 300, compression = "lzw")
+```
+
+```{r}
+#4th
+ggplot(ps.prev.topPhyl4.ra_melt, aes(x = Region, y = Abundance, color = Regime)) + 
+  geom_point(position = position_jitterdodge(jitter.width = 0.5, dodge.width = 0.7)) +
+  theme_bw() +
+  facet_wrap(~Phylum) +
+  labs(y = "") +
+  #theme(axis.text.x = element_text(angle = 90)) +
+  theme(text = element_text(size = 18), axis.text.x = element_text(size = 16), strip.text = element_text(size = 18)) +
+  scale_color_manual(values = c("#C71585", "#008080"), labels = c("MMV", "VMV")) +
+  guides(color = guide_legend(title = "Regime"))
+#ggsave("figures/fig6f.tiff", height = 4, width = 5, units = "in", dpi = 300, compression = "lzw")
+```
+
+Boxplots to show the stat sig on fig + non parametric (showed same results excpet for teh Actionbacteriota and Bacteroidota)
+```{r}
+# 1st 
+ggplot(ps.prev.topPhyl1.ra_melt, aes(x = Region, y = Abundance, color = Regime)) + 
+  geom_boxplot() +
+  theme_bw() +
+  facet_wrap(~Phylum) +
+  labs(y = "") +
+  theme(axis.text.x = element_text(angle = 90)) +
+  theme(text = element_text(size = 18)) +
+  scale_color_manual(values = c("#C71585", "#008080"), labels = c("MMV", "VMV")) +
+  guides(color = guide_legend(title = "Regime")) +
+  geom_jitter(position = position_jitterdodge(0.5))
+#ggsave("figures/fig6c.tiff", height = 4, width = 5, units = "in", dpi = 300, compression = "lzw")
+```
+
+```{r}
+# 2nd 
+ggplot(ps.prev.topPhyl2.ra_melt, aes(x = Region, y = Abundance, color = Regime)) + 
+  geom_boxplot() +
+  theme_bw() +
+  facet_wrap(~Phylum) +
+  labs(y = "") +
+  theme(axis.text.x = element_text(angle = 90)) +
+  theme(text = element_text(size = 18)) +
+  scale_color_manual(values = c("#C71585", "#008080")) +
+  geom_jitter(position = position_jitterdodge(0.5))
+#ggsave("figures/fig6d.tiff", height = 4, width = 5, units = "in", dpi = 300, compression = "lzw")
+```
+
+```{r}
+# 3rd 
+ggplot(ps.prev.topPhyl3.ra_melt, aes(x = Region, y = Abundance, color = Regime)) + 
+  geom_boxplot() +
+  theme_bw() +
+  facet_wrap(~Phylum) +
+  labs(y = "") +
+  theme(axis.text.x = element_text(angle = 90)) +
+  theme(text = element_text(size = 18)) +
+  scale_color_manual(values = c("#C71585", "#008080"), labels = c("MMV", "VMV")) +
+  guides(color = guide_legend(title = "Regime")) +
+  geom_jitter(position = position_jitterdodge(0.5))
+#ggsave("figures/fig6e.tiff", height = 4, width = 5, units = "in", dpi = 300, compression = "lzw")
+```
+
+```{r}
+# 4th 
+ggplot(ps.prev.topPhyl4.ra_melt, aes(x = Region, y = Abundance, color = Regime)) + 
+  geom_boxplot() +
+  theme_bw() +
+  facet_wrap(~Phylum) +
+  labs(y = "") +
+  theme(axis.text.x = element_text(angle = 90)) +
+  theme(text = element_text(size = 18)) +
+  scale_color_manual(values = c("#C71585", "#008080"), labels = c("MMV", "VMV")) +
+  guides(color = guide_legend(title = "Regime")) +
+  geom_jitter(position = position_jitterdodge(0.5))
+#ggsave("figures/fig6f.tiff", height = 4, width = 5, units = "in", dpi = 300, compression = "lzw")
+```
+
+```{r}
+## stats
+firmicutes <- compare_means(Abundance ~ region_regime,
+                                                             group.by = "Phylum",
+                                                             ps.prev.topPhyl1.ra_melt,
+                                                             p.adjust.method = "BH")
+firmicutes
+#write.table(firmicutes, file = "tables/firmicutes_compareMeans.txt", sep = "\t")
+```
+
+```{r}
+proteobacteria <- compare_means(Abundance ~ region_regime,
+                                                             group.by = "Phylum",
+                                                             ps.prev.topPhyl2.ra_melt,
+                                                             p.adjust.method = "BH")
+proteobacteria
+#write.table(proteobacteria, file = "tables/proteobacteria_compareMeans.txt", sep = "\t")
+```
+
+```{r}
+actinobacteriota <- compare_means(Abundance ~ region_regime,
+                                                             group.by = "Phylum",
+                                                             ps.prev.topPhyl3.ra_melt,
+                                                             p.adjust.method = "BH")
+actinobacteriota
+#write.table(actinobacteriota, file = "tables/actinobacteriota_compareMeans.txt", sep = "\t")
+```
+
+```{r}
+bacteroidota <- compare_means(Abundance ~ region_regime,
+                                                             group.by = "Phylum",
+                                                             ps.prev.topPhyl4.ra_melt,
+                                                             p.adjust.method = "BH")
+bacteroidota
+#write.table(bacteroidota, file = "tables/bacteroidota_compareMeans.txt", sep = "\t")
+```
+
+```{r}
+sessionInfo()
+```
+

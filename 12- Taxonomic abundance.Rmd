@@ -1,0 +1,75 @@
+---
+title: "Taxonomic abundance"
+author: "Marwa Tawfik"
+date: "07 07 2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# load libraries
+library("microeco")
+library("file2meco")
+library("ggplot2")
+```
+
+```{r}
+ps.prev <- readRDS("phyobjects/STEP 15/ps.prev.f.rds")
+dataset <- phyloseq2meco(ps.prev)
+#ps.prev.intes <- readRDS("phyobjects/STEP 15/ps.prev.intes.f.rds")
+#dataset.intes <- phyloseq2meco(ps.prev.intes)
+```
+
+```{r}
+# PHYLUM 
+t1 <- trans_abund$new(dataset = dataset, taxrank = "Phylum")
+t1$plot_bar(facet = c("Region", "Regime"),
+            others_color = "black",
+            order_x = names(sort(unlist(dataset$taxa_abund$Phylum["k__Bacteria|p__Firmicutes", ])))) + 
+  theme(axis.text.x = element_blank()) +
+  labs(x = "Samples")
+
+# ggsave("figures/fig3a.tiff", height = 4, width = 15, units = "in", dpi = 300, compression = "lzw")
+```
+
+```{r}
+t1 <- trans_abund$new(dataset = dataset, taxrank = "Phylum", groupmean = "Region_Regime")
+t1$plot_bar(xtext_angle = 90,
+            others_color = "black") 
+
+#ggsave("figures/fig3b.tiff", height = 4, width = 15, units = "in", dpi = 300, compression = "lzw")
+```
+
+```{r}
+# GENUS (family when genus NA)
+# SELECTING those which have NA to replace them 
+na.genus <- is.na(tax_table(ps.prev)[,"Genus"])
+# Replace them with full name consisting of Family and Genus
+tax_table(ps.prev)[na.genus][,"Genus"] <- paste(tax_table(ps.prev)[na.genus][,"Family"], 
+                                                    tax_table(ps.prev)[na.genus][,"Genus"])
+dataset <- phyloseq2meco(ps.prev)
+```
+
+```{r}
+t1 <- trans_abund$new(dataset = dataset, taxrank = "Genus", ntaxa = 20)
+t1$plot_bar(facet = c("Region", "Regime"),
+            others_color = "black",
+            order_x = names(sort(unlist(dataset$taxa_abund$Genus["k__Bacteria|p__Firmicutes|c__Clostridia|o__Oscillospirales|f__Ruminococcaceae|g__Ruminococcaceae NA", ])))) + 
+  theme(axis.text.x = element_blank())  +
+  labs(x = "Samples")
+#ggsave("figures/fig4a.tiff", height = 4, width = 15, units = "in", dpi = 300, compression = "lzw")
+```
+
+```{r}
+t1 <- trans_abund$new(dataset = dataset, taxrank = "Genus", groupmean = "Region_Regime", ntaxa = 20)
+t1$plot_bar(xtext_angle = 90,
+            others_color = "black") 
+ggsave("figures/fig4b.tiff", height = 4, width = 15, units = "in", dpi = 300, compression = "lzw")
+```
+
+```{r}
+sessionInfo()
+```

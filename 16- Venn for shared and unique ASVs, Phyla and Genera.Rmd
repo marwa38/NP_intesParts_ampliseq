@@ -1,0 +1,1769 @@
+---
+title: "STEP 19'. Venn Diagrams for shared & unique ASVs and phyla"
+author: "Marwa Tawfik"
+summary: "Microbiome_dada2_pipeline_intesParts"
+Platform: "R version 4.1.0 (2021-05-18) -- Camp Pontanezen; x86_64-conda-linux-gnu (64-bit)"
+date: "22 October 2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+## venn diagram to show unique and shared ASVs ----
+# load libraries 
+library(MicEco)
+library(phyloseq)
+```
+
+```{r}
+ps.prev <- readRDS("phyobjects/STEP 15/ps.prev.f.rds")
+```
+
+```{r}
+# subsets ----
+## intes, feed & water  
+
+## PYLORIC + water and feed 
+ps.prev.pyWtrFeed <- subset_samples(ps.prev, Region == "pyloric" |
+                                       Region_Regime == "feed.V" |
+                                          sample == "water" )
+ps.prev.pyWtrFeed <- prune_taxa(taxa_sums(ps.prev.pyWtrFeed) > 0, ps.prev.pyWtrFeed)
+# MMV only 
+ps.prev.pyWtrFeed.MMV <- subset_samples(ps.prev, Region_Regime == "pyloric.MMV" |
+                                         Region_Regime == "feed.V" |
+                                         Region_Regime == "water.MMV" )
+ps.prev.pyWtrFeed.MMV <- prune_taxa(taxa_sums(ps.prev.pyWtrFeed.MMV) > 0, ps.prev.pyWtrFeed.MMV)
+
+# VMV only
+ps.prev.pyWtrFeed.VMV <- subset_samples(ps.prev, Region_Regime == "pyloric.VMV" |
+                                          Region_Regime == "feed.V" |
+                                          Region_Regime == "water.VMV" )
+ps.prev.pyWtrFeed.VMV <- prune_taxa(taxa_sums(ps.prev.pyWtrFeed.VMV) > 0, ps.prev.pyWtrFeed.VMV)
+
+```
+
+
+```{r}
+# ASVs venn ----
+tiff("figures/venn.ps.prev.pyWtrFeed.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyWtrFeed, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+ 
+tiff("figures/venn.ps.prev.pyWtrFeed.MMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyWtrFeed.MMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.pyWtrFeed.VMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyWtrFeed.VMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## phyla only for each subset
+ps.prev.pyWtrFeed.phylum <- tax_glom(ps.prev.pyWtrFeed, taxrank = "Phylum")
+ps.prev.pyWtrFeed.MMV.phylum <- tax_glom(ps.prev.pyWtrFeed.MMV, taxrank = "Phylum")
+ps.prev.pyWtrFeed.VMV.phylum <- tax_glom(ps.prev.pyWtrFeed.VMV, taxrank = "Phylum")
+```
+
+```{r}
+# phyla venn ----
+tiff("figures/venn.ps.prev.pyWtrFeed.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyWtrFeed.phylum, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+ 
+tiff("figures/venn.ps.prev.pyWtrFeed.MMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyWtrFeed.MMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.pyWtrFeed.VMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyWtrFeed.VMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## genera only for each subset
+ps.prev.pyWtrFeed.genus <- tax_glom(ps.prev.pyWtrFeed, taxrank = "Genus")
+ps.prev.pyWtrFeed.MMV.genus <- tax_glom(ps.prev.pyWtrFeed.MMV, taxrank = "Genus")
+ps.prev.pyWtrFeed.VMV.genus <- tax_glom(ps.prev.pyWtrFeed.VMV, taxrank = "Genus")
+```
+
+```{r}
+# genera venn ----
+tiff("figures/venn.ps.prev.pyWtrFeed.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyWtrFeed.genus, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+ 
+tiff("figures/venn.ps.prev.pyWtrFeed.MMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyWtrFeed.MMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.pyWtrFeed.VMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyWtrFeed.VMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+# subsets ----
+## intes, feed & water  
+
+## PYLORIC + water and feed 
+ps.prev.pyWtr <- subset_samples(ps.prev, Region == "pyloric" |
+                                      sample == "water" )
+ps.prev.pyWtr <- prune_taxa(taxa_sums(ps.prev.pyWtr) > 0, ps.prev.pyWtr)
+# MMV only 
+ps.prev.pyWtr.MMV <- subset_samples(ps.prev, Region_Regime == "pyloric.MMV" |
+                                          Region_Regime == "water.MMV" )
+ps.prev.pyWtr.MMV <- prune_taxa(taxa_sums(ps.prev.pyWtr.MMV) > 0, ps.prev.pyWtr.MMV)
+
+# VMV only
+ps.prev.pyWtr.VMV <- subset_samples(ps.prev, Region_Regime == "pyloric.VMV" |
+                                          Region_Regime == "water.VMV" )
+ps.prev.pyWtr.VMV <- prune_taxa(taxa_sums(ps.prev.pyWtr.VMV) > 0, ps.prev.pyWtr.VMV)
+
+```
+
+```{r}
+# ASVs venn ----
+tiff("figures/venn.ps.prev.pyWtr.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyWtr, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.pyWtr.MMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyWtr.MMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.pyWtr.VMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyWtr.VMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## phyla only for each subset
+ps.prev.pyWtr.phylum <- tax_glom(ps.prev.pyWtr, taxrank = "Phylum")
+ps.prev.pyWtr.MMV.phylum <- tax_glom(ps.prev.pyWtr.MMV, taxrank = "Phylum")
+ps.prev.pyWtr.VMV.phylum <- tax_glom(ps.prev.pyWtr.VMV, taxrank = "Phylum")
+```
+
+```{r}
+# venn ----
+tiff("figures/venn.ps.prev.pyWtr.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyWtr.phylum, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.pyWtr.MMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyWtr.MMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.pyWtr.VMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyWtr.VMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## genera only for each subset
+ps.prev.pyWtr.genus <- tax_glom(ps.prev.pyWtr, taxrank = "Genus")
+ps.prev.pyWtr.MMV.genus <- tax_glom(ps.prev.pyWtr.MMV, taxrank = "Genus")
+ps.prev.pyWtr.VMV.genus <- tax_glom(ps.prev.pyWtr.VMV, taxrank = "Genus")
+```
+
+```{r}
+# genera venn ----
+tiff("figures/venn.ps.prev.pyWtr.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyWtr.genus, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.pyWtr.MMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyWtr.MMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.pyWtr.VMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyWtr.VMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+# subsets ----
+## intes, feed & water  
+
+## PYLORIC + water and feed 
+ps.prev.pyFeed <- subset_samples(ps.prev, Region == "pyloric" |
+                                      Region_Regime == "feed.V")
+ps.prev.pyFeed <- prune_taxa(taxa_sums(ps.prev.pyFeed) > 0, ps.prev.pyFeed)
+# MMV only 
+ps.prev.pyFeed.MMV <- subset_samples(ps.prev, Region_Regime == "pyloric.MMV" |
+                                          Region_Regime == "feed.V")
+ps.prev.pyFeed.MMV <- prune_taxa(taxa_sums(ps.prev.pyFeed.MMV) > 0, ps.prev.pyFeed.MMV)
+
+# VMV only
+ps.prev.pyFeed.VMV <- subset_samples(ps.prev, Region_Regime == "pyloric.VMV" |
+                                          Region_Regime == "feed.V")
+ps.prev.pyFeed.VMV <- prune_taxa(taxa_sums(ps.prev.pyFeed.VMV) > 0, ps.prev.pyFeed.VMV)
+
+```
+
+```{r}
+# ASVs venn ----
+tiff("figures/venn.ps.prev.pyFeed.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyFeed, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.pyFeed.MMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyFeed.MMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.pyFeed.VMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyFeed.VMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## phyla only for each subset
+ps.prev.pyFeed.phylum <- tax_glom(ps.prev.pyFeed, taxrank = "Phylum")
+ps.prev.pyFeed.MMV.phylum <- tax_glom(ps.prev.pyFeed.MMV, taxrank = "Phylum")
+ps.prev.pyFeed.VMV.phylum <- tax_glom(ps.prev.pyFeed.VMV, taxrank = "Phylum")
+```
+
+```{r}
+# venn ----
+tiff("figures/venn.ps.prev.pyFeed.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyFeed.phylum, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.pyFeed.MMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyFeed.MMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.pyFeed.VMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyFeed.VMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## genera only for each subset
+ps.prev.pyFeed.genus <- tax_glom(ps.prev.pyFeed, taxrank = "Genus")
+ps.prev.pyFeed.MMV.genus <- tax_glom(ps.prev.pyFeed.MMV, taxrank = "Genus")
+ps.prev.pyFeed.VMV.genus <- tax_glom(ps.prev.pyFeed.VMV, taxrank = "Genus")
+```
+
+```{r}
+# genera venn ----
+tiff("figures/venn.ps.prev.pyFeed.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyFeed.genus, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.pyFeed.MMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyFeed.MMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.pyFeed.VMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyFeed.VMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## middle + water and feed 
+ps.prev.mdWtrFeed <- subset_samples(ps.prev, Region == "middle" |
+                                      Region_Regime == "feed.V" |
+                                      sample == "water" )
+ps.prev.mdWtrFeed <- prune_taxa(taxa_sums(ps.prev.mdWtrFeed) > 0, ps.prev.mdWtrFeed)
+# MMV only 
+ps.prev.mdWtrFeed.MMV <- subset_samples(ps.prev, Region_Regime == "middle.MMV" |
+                                          Region_Regime == "feed.V" |
+                                          Region_Regime == "water.MMV" )
+ps.prev.mdWtrFeed.MMV <- prune_taxa(taxa_sums(ps.prev.mdWtrFeed.MMV) > 0, ps.prev.mdWtrFeed.MMV)
+
+# VMV only
+ps.prev.mdWtrFeed.VMV <- subset_samples(ps.prev, Region_Regime == "middle.VMV" |
+                                          Region_Regime == "feed.V" |
+                                          Region_Regime == "water.VMV" )
+ps.prev.mdWtrFeed.VMV <- prune_taxa(taxa_sums(ps.prev.mdWtrFeed.VMV) > 0, ps.prev.mdWtrFeed.VMV)
+```
+
+```{r}
+# ASVs venn ----
+tiff("figures/venn.ps.prev.mdWtrFeed.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdWtrFeed, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+ 
+tiff("figures/venn.ps.prev.mdWtrFeed.MMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdWtrFeed.MMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.mdWtrFeed.VMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdWtrFeed.VMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## phyla only for each subset
+ps.prev.mdWtrFeed.phylum <- tax_glom(ps.prev.mdWtrFeed, taxrank = "Phylum")
+ps.prev.mdWtrFeed.MMV.phylum <- tax_glom(ps.prev.mdWtrFeed.MMV, taxrank = "Phylum")
+ps.prev.mdWtrFeed.VMV.phylum <- tax_glom(ps.prev.mdWtrFeed.VMV, taxrank = "Phylum")
+```
+
+```{r}
+# phyla venn ----
+tiff("figures/venn.ps.prev.mdWtrFeed.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdWtrFeed.phylum, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+ 
+tiff("figures/venn.ps.prev.mdWtrFeed.MMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdWtrFeed.MMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.mdWtrFeed.VMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdWtrFeed.VMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## genera only for each subset
+ps.prev.mdWtrFeed.genus <- tax_glom(ps.prev.mdWtrFeed, taxrank = "Genus")
+ps.prev.mdWtrFeed.MMV.genus <- tax_glom(ps.prev.mdWtrFeed.MMV, taxrank = "Genus")
+ps.prev.mdWtrFeed.VMV.genus <- tax_glom(ps.prev.mdWtrFeed.VMV, taxrank = "Genus")
+```
+
+```{r}
+# genera venn ----
+tiff("figures/venn.ps.prev.mdWtrFeed.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdWtrFeed.genus, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.mdWtrFeed.MMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdWtrFeed.MMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.mdWtrFeed.VMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdWtrFeed.VMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+# subsets ----
+## middle and water
+
+ps.prev.mdWtr <- subset_samples(ps.prev, Region == "middle" |
+                                      sample == "water" )
+ps.prev.mdWtr <- prune_taxa(taxa_sums(ps.prev.mdWtr) > 0, ps.prev.mdWtr)
+# MMV only 
+ps.prev.mdWtr.MMV <- subset_samples(ps.prev, Region_Regime == "middle.MMV" |
+                                          Region_Regime == "water.MMV" )
+ps.prev.mdWtr.MMV <- prune_taxa(taxa_sums(ps.prev.mdWtr.MMV) > 0, ps.prev.mdWtr.MMV)
+
+# VMV only
+ps.prev.mdWtr.VMV <- subset_samples(ps.prev, Region_Regime == "middle.VMV" |
+                                          Region_Regime == "water.VMV" )
+ps.prev.mdWtr.VMV <- prune_taxa(taxa_sums(ps.prev.mdWtr.VMV) > 0, ps.prev.mdWtr.VMV)
+
+```
+
+```{r}
+# ASVs venn ----
+tiff("figures/venn.ps.prev.mdWtr.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdWtr, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.mdWtr.MMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdWtr.MMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.mdWtr.VMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdWtr.VMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## phyla only for each subset
+ps.prev.mdWtr.phylum <- tax_glom(ps.prev.mdWtr, taxrank = "Phylum")
+ps.prev.mdWtr.MMV.phylum <- tax_glom(ps.prev.mdWtr.MMV, taxrank = "Phylum")
+ps.prev.mdWtr.VMV.phylum <- tax_glom(ps.prev.mdWtr.VMV, taxrank = "Phylum")
+```
+
+```{r}
+# venn ----
+tiff("figures/venn.ps.prev.mdWtr.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdWtr.phylum, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.mdWtr.MMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdWtr.MMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.mdWtr.VMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdWtr.VMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## genera only for each subset
+ps.prev.mdWtr.genus <- tax_glom(ps.prev.mdWtr, taxrank = "Genus")
+ps.prev.mdWtr.MMV.genus <- tax_glom(ps.prev.mdWtr.MMV, taxrank = "Genus")
+ps.prev.mdWtr.VMV.genus <- tax_glom(ps.prev.mdWtr.VMV, taxrank = "Genus")
+```
+
+```{r}
+# genera venn ----
+tiff("figures/venn.ps.prev.mdWtr.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdWtr.genus, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.mdWtr.MMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdWtr.MMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.mdWtr.VMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdWtr.VMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+# subsets ----
+## middle and feed 
+
+ps.prev.mdFeed <- subset_samples(ps.prev, Region == "middle" |
+                                      Region_Regime == "feed.V")
+ps.prev.mdFeed <- prune_taxa(taxa_sums(ps.prev.mdFeed) > 0, ps.prev.mdFeed)
+# MMV only 
+ps.prev.mdFeed.MMV <- subset_samples(ps.prev, Region_Regime == "middle.MMV" |
+                                          Region_Regime == "feed.V")
+ps.prev.mdFeed.MMV <- prune_taxa(taxa_sums(ps.prev.mdFeed.MMV) > 0, ps.prev.mdFeed.MMV)
+
+# VMV only
+ps.prev.mdFeed.VMV <- subset_samples(ps.prev, Region_Regime == "middle.VMV" |
+                                          Region_Regime == "feed.V")
+ps.prev.mdFeed.VMV <- prune_taxa(taxa_sums(ps.prev.mdFeed.VMV) > 0, ps.prev.mdFeed.VMV)
+
+```
+
+```{r}
+# ASVs venn ----
+tiff("figures/venn.ps.prev.mdFeed.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdFeed, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.mdFeed.MMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdFeed.MMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.mdFeed.VMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdFeed.VMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## phyla only for each subset
+ps.prev.mdFeed.phylum <- tax_glom(ps.prev.mdFeed, taxrank = "Phylum")
+ps.prev.mdFeed.MMV.phylum <- tax_glom(ps.prev.mdFeed.MMV, taxrank = "Phylum")
+ps.prev.mdFeed.VMV.phylum <- tax_glom(ps.prev.mdFeed.VMV, taxrank = "Phylum")
+```
+
+```{r}
+# venn ----
+tiff("figures/venn.ps.prev.mdFeed.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdFeed.phylum, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.mdFeed.MMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdFeed.MMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.mdFeed.VMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdFeed.VMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## genera only for each subset
+ps.prev.mdFeed.genus <- tax_glom(ps.prev.mdFeed, taxrank = "Genus")
+ps.prev.mdFeed.MMV.genus <- tax_glom(ps.prev.mdFeed.MMV, taxrank = "Genus")
+ps.prev.mdFeed.VMV.genus <- tax_glom(ps.prev.mdFeed.VMV, taxrank = "Genus")
+```
+
+```{r}
+# genera venn ----
+tiff("figures/venn.ps.prev.mdFeed.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdFeed.genus, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.mdFeed.MMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdFeed.MMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.mdFeed.VMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdFeed.VMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## distal + water and feed 
+ps.prev.dsWtrFeed <- subset_samples(ps.prev, Region == "distal" |
+                                      Region_Regime == "feed.V" |
+                                      sample == "water" )
+ps.prev.dsWtrFeed <- prune_taxa(taxa_sums(ps.prev.dsWtrFeed) > 0, ps.prev.dsWtrFeed)
+# MMV only 
+ps.prev.dsWtrFeed.MMV <- subset_samples(ps.prev, Region_Regime == "distal.MMV" |
+                                          Region_Regime == "feed.V" |
+                                          Region_Regime == "water.MMV" )
+ps.prev.dsWtrFeed.MMV <- prune_taxa(taxa_sums(ps.prev.dsWtrFeed.MMV) > 0, ps.prev.dsWtrFeed.MMV)
+
+# VMV only
+ps.prev.dsWtrFeed.VMV <- subset_samples(ps.prev, Region_Regime == "distal.VMV" |
+                                          Region_Regime == "feed.V" |
+                                          Region_Regime == "water.VMV" )
+ps.prev.dsWtrFeed.VMV <- prune_taxa(taxa_sums(ps.prev.dsWtrFeed.VMV) > 0, ps.prev.dsWtrFeed.VMV)
+```
+
+```{r}
+# ASVs venn ----
+tiff("figures/venn.ps.prev.dsWtrFeed.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsWtrFeed, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.dsWtrFeed.MMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsWtrFeed.MMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.dsWtrFeed.VMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsWtrFeed.VMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## phyla only for each subset
+ps.prev.dsWtrFeed.phylum <- tax_glom(ps.prev.dsWtrFeed, taxrank = "Phylum")
+ps.prev.dsWtrFeed.MMV.phylum <- tax_glom(ps.prev.dsWtrFeed.MMV, taxrank = "Phylum")
+ps.prev.dsWtrFeed.VMV.phylum <- tax_glom(ps.prev.dsWtrFeed.VMV, taxrank = "Phylum")
+```
+
+```{r}
+# venn ----
+tiff("figures/venn.ps.prev.dsWtrFeed.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsWtrFeed.phylum, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.dsWtrFeed.MMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsWtrFeed.MMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.dsWtrFeed.VMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsWtrFeed.VMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## genera only for each subset
+ps.prev.dsWtrFeed.genus <- tax_glom(ps.prev.dsWtrFeed, taxrank = "Genus")
+ps.prev.dsWtrFeed.MMV.genus <- tax_glom(ps.prev.dsWtrFeed.MMV, taxrank = "Genus")
+ps.prev.dsWtrFeed.VMV.genus <- tax_glom(ps.prev.dsWtrFeed.VMV, taxrank = "Genus")
+```
+
+```{r}
+# genera venn ----
+tiff("figures/venn.ps.prev.dsWtrFeed.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsWtrFeed.genus, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.dsWtrFeed.MMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsWtrFeed.MMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.dsWtrFeed.VMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsWtrFeed.VMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+# subsets ----
+## distal and water
+
+ps.prev.dsWtr <- subset_samples(ps.prev, Region == "distal" |
+                                      sample == "water" )
+ps.prev.dsWtr <- prune_taxa(taxa_sums(ps.prev.dsWtr) > 0, ps.prev.dsWtr)
+# MMV only 
+ps.prev.dsWtr.MMV <- subset_samples(ps.prev, Region_Regime == "distal.MMV" |
+                                          Region_Regime == "water.MMV" )
+ps.prev.dsWtr.MMV <- prune_taxa(taxa_sums(ps.prev.dsWtr.MMV) > 0, ps.prev.dsWtr.MMV)
+
+# VMV only
+ps.prev.dsWtr.VMV <- subset_samples(ps.prev, Region_Regime == "distal.VMV" |
+                                          Region_Regime == "water.VMV" )
+ps.prev.dsWtr.VMV <- prune_taxa(taxa_sums(ps.prev.dsWtr.VMV) > 0, ps.prev.dsWtr.VMV)
+
+```
+
+```{r}
+# ASVs venn ----
+tiff("figures/venn.ps.prev.dsWtr.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsWtr, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.dsWtr.MMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsWtr.MMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.dsWtr.VMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsWtr.VMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## phyla only for each subset
+ps.prev.dsWtr.phylum <- tax_glom(ps.prev.dsWtr, taxrank = "Phylum")
+ps.prev.dsWtr.MMV.phylum <- tax_glom(ps.prev.dsWtr.MMV, taxrank = "Phylum")
+ps.prev.dsWtr.VMV.phylum <- tax_glom(ps.prev.dsWtr.VMV, taxrank = "Phylum")
+```
+
+```{r}
+# venn ----
+tiff("figures/venn.ps.prev.dsWtr.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsWtr.phylum, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.dsWtr.MMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsWtr.MMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.dsWtr.VMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsWtr.VMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## genera only for each subset
+ps.prev.dsWtr.genus <- tax_glom(ps.prev.dsWtr, taxrank = "Genus")
+ps.prev.dsWtr.MMV.genus <- tax_glom(ps.prev.dsWtr.MMV, taxrank = "Genus")
+ps.prev.dsWtr.VMV.genus <- tax_glom(ps.prev.dsWtr.VMV, taxrank = "Genus")
+```
+
+```{r}
+# genera venn ----
+tiff("figures/venn.ps.prev.dsWtr.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsWtr.genus, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.dsWtr.MMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsWtr.MMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.dsWtr.VMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsWtr.VMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+# subsets ----
+## distal and feed 
+
+ps.prev.dsFeed <- subset_samples(ps.prev, Region == "distal" |
+                                      Region_Regime == "feed.V")
+ps.prev.dsFeed <- prune_taxa(taxa_sums(ps.prev.dsFeed) > 0, ps.prev.dsFeed)
+# MMV only 
+ps.prev.dsFeed.MMV <- subset_samples(ps.prev, Region_Regime == "distal.MMV" |
+                                          Region_Regime == "feed.V")
+ps.prev.dsFeed.MMV <- prune_taxa(taxa_sums(ps.prev.dsFeed.MMV) > 0, ps.prev.dsFeed.MMV)
+
+# VMV only
+ps.prev.dsFeed.VMV <- subset_samples(ps.prev, Region_Regime == "distal.VMV" |
+                                          Region_Regime == "feed.V")
+ps.prev.dsFeed.VMV <- prune_taxa(taxa_sums(ps.prev.dsFeed.VMV) > 0, ps.prev.dsFeed.VMV)
+
+```
+
+```{r}
+# ASVs venn ----
+tiff("figures/venn.ps.prev.dsFeed.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsFeed, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.dsFeed.MMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsFeed.MMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.dsFeed.VMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsFeed.VMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## phyla only for each subset
+ps.prev.dsFeed.phylum <- tax_glom(ps.prev.dsFeed, taxrank = "Phylum")
+ps.prev.dsFeed.MMV.phylum <- tax_glom(ps.prev.dsFeed.MMV, taxrank = "Phylum")
+ps.prev.dsFeed.VMV.phylum <- tax_glom(ps.prev.dsFeed.VMV, taxrank = "Phylum")
+```
+
+```{r}
+# venn ----
+tiff("figures/venn.ps.prev.dsFeed.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsFeed.phylum, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.dsFeed.MMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsFeed.MMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.dsFeed.VMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsFeed.VMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## genera only for each subset
+ps.prev.dsFeed.genus <- tax_glom(ps.prev.dsFeed, taxrank = "Genus")
+ps.prev.dsFeed.MMV.genus <- tax_glom(ps.prev.dsFeed.MMV, taxrank = "Genus")
+ps.prev.dsFeed.VMV.genus <- tax_glom(ps.prev.dsFeed.VMV, taxrank = "Genus")
+```
+
+```{r}
+# genera venn ----
+tiff("figures/venn.ps.prev.dsFeed.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsFeed.genus, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.dsFeed.MMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsFeed.MMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.dsFeed.VMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsFeed.VMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+# pyloric 
+ps.prev.py <- subset_samples(ps.prev, Region == "pyloric")
+ps.prev.py <- prune_taxa(taxa_sums(ps.prev.py) > 0, ps.prev.py)
+
+# middle 
+ps.prev.md <- subset_samples(ps.prev, Region == "middle")
+ps.prev.md <- prune_taxa(taxa_sums(ps.prev.md) > 0, ps.prev.md)
+
+# distal 
+ps.prev.ds <- subset_samples(ps.prev, Region == "distal")
+ps.prev.ds <- prune_taxa(taxa_sums(ps.prev.ds) > 0, ps.prev.ds)
+```
+
+
+```{r}
+# ASVs venn ----
+tiff("figures/venn.ps.prev.py.tiff", width = 650, height = 650)
+ps_venn(ps.prev.py, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.md.tiff", width = 650, height = 650)
+ps_venn(ps.prev.md, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.ds.tiff", width = 650, height = 650)
+ps_venn(ps.prev.ds, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## phyla only for each subset
+ps.prev.py.phylum <- tax_glom(ps.prev.py, taxrank = "Phylum")
+ps.prev.md.phylum <- tax_glom(ps.prev.md, taxrank = "Phylum")
+ps.prev.ds.phylum <- tax_glom(ps.prev.ds, taxrank = "Phylum")
+```
+
+
+```{r}
+# phyla venn ----
+tiff("figures/venn.ps.prev.py.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.py.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.md.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.md.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.ds.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.ds.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## genera only for each subset
+ps.prev.py.genus <- tax_glom(ps.prev.py, taxrank = "Genus")
+ps.prev.md.genus <- tax_glom(ps.prev.md, taxrank = "Genus")
+ps.prev.ds.genus <- tax_glom(ps.prev.ds, taxrank = "Genus")
+```
+
+```{r}
+# genera venn ----
+tiff("figures/venn.ps.prev.py.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.py.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.md.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.md.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.ds.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.ds.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## intes only 
+# MMV only 
+ps.prev.pyMdds.MMV <- subset_samples(ps.prev, Region_Regime == "pyloric.MMV" |
+                                       Region_Regime == "middle.MMV" |
+                                       Region_Regime == "distal.MMV" )
+ps.prev.pyMdds.MMV <- prune_taxa(taxa_sums(ps.prev.pyMdds.MMV) > 0, ps.prev.pyMdds.MMV)
+
+# VMV only
+ps.prev.pyMdds.VMV <- subset_samples(ps.prev, Region_Regime == "pyloric.VMV" |
+                                       Region_Regime == "middle.VMV" |
+                                       Region_Regime == "distal.VMV" )
+ps.prev.pyMdds.VMV <- prune_taxa(taxa_sums(ps.prev.pyMdds.VMV) > 0, ps.prev.pyMdds.VMV)
+```
+
+```{r}
+# ASVs venn ----
+tiff("figures/venn.ps.prev.pyMdds.MMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyMdds.MMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.pyMdds.VMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyMdds.VMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## phyla only for each subset
+ps.prev.pyMdds.MMV.phylum <- tax_glom(ps.prev.pyMdds.MMV, taxrank = "Phylum")
+ps.prev.pyMdds.VMV.phylum <- tax_glom(ps.prev.pyMdds.VMV, taxrank = "Phylum")
+```
+
+
+```{r}
+# phyla venn ----
+tiff("figures/venn.ps.prev.pyMdds.MMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyMdds.MMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.pyMdds.VMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyMdds.VMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## genera only for each subset
+ps.prev.pyMdds.MMV.genus <- tax_glom(ps.prev.pyMdds.MMV, taxrank = "Genus")
+ps.prev.pyMdds.VMV.genus <- tax_glom(ps.prev.pyMdds.VMV, taxrank = "Genus")
+```
+
+```{r}
+# genera venn ----
+tiff("figures/venn.ps.prev.pyMdds.MMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyMdds.MMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.pyMdds.VMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyMdds.VMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+### intes only 
+## PY VS MD
+# MMV only 
+ps.prev.pyMd.MMV <- subset_samples(ps.prev, Region_Regime == "pyloric.MMV" |
+                                       Region_Regime == "middle.MMV" )
+ps.prev.pyMd.MMV <- prune_taxa(taxa_sums(ps.prev.pyMd.MMV) > 0, ps.prev.pyMd.MMV)
+
+# VMV only
+ps.prev.pyMd.VMV <- subset_samples(ps.prev, Region_Regime == "pyloric.VMV" |
+                                       Region_Regime == "middle.VMV")
+ps.prev.pyMd.VMV <- prune_taxa(taxa_sums(ps.prev.pyMd.VMV) > 0, ps.prev.pyMd.VMV)
+```
+
+```{r}
+# ASVs venn ----
+tiff("figures/venn.ps.prev.pyMd.MMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyMd.MMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.pyMd.VMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyMd.VMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## phyla only for each subset
+ps.prev.pyMd.MMV.phylum <- tax_glom(ps.prev.pyMd.MMV, taxrank = "Phylum")
+ps.prev.pyMd.VMV.phylum <- tax_glom(ps.prev.pyMd.VMV, taxrank = "Phylum")
+```
+
+```{r}
+# phyla venn ----
+tiff("figures/venn.ps.prev.pyMd.MMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyMd.MMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.pyMd.VMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyMd.VMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## genera only for each subset
+ps.prev.pyMd.MMV.genus <- tax_glom(ps.prev.pyMd.MMV, taxrank = "Genus")
+ps.prev.pyMd.VMV.genus <- tax_glom(ps.prev.pyMd.VMV, taxrank = "Genus")
+```
+
+```{r}
+# genera venn ----
+tiff("figures/venn.ps.prev.pyMd.MMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyMd.MMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.pyMd.VMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.pyMd.VMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+### intes only 
+## MD VS DS
+# MMV only 
+ps.prev.mdDs.MMV <- subset_samples(ps.prev, Region_Regime == "middle.MMV" |
+                                       Region_Regime == "distal.MMV" )
+ps.prev.mdDs.MMV <- prune_taxa(taxa_sums(ps.prev.mdDs.MMV) > 0, ps.prev.mdDs.MMV)
+
+# VMV only
+ps.prev.mdDs.VMV <- subset_samples(ps.prev, Region_Regime == "middle.VMV" |
+                                       Region_Regime == "distal.VMV" )
+ps.prev.mdDs.VMV <- prune_taxa(taxa_sums(ps.prev.mdDs.VMV) > 0, ps.prev.mdDs.VMV)
+```
+
+```{r}
+# ASVs venn ----
+tiff("figures/venn.ps.prev.mdDs.MMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdDs.MMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.mdDs.VMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdDs.VMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## phyla only for each subset
+ps.prev.mdDs.MMV.phylum <- tax_glom(ps.prev.mdDs.MMV, taxrank = "Phylum")
+ps.prev.mdDs.VMV.phylum <- tax_glom(ps.prev.mdDs.VMV, taxrank = "Phylum")
+```
+
+```{r}
+# phyla venn ----
+tiff("figures/venn.ps.prev.mdDs.MMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdDs.MMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.mdDs.VMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdDs.VMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## genera only for each subset
+ps.prev.mdDs.MMV.genus <- tax_glom(ps.prev.mdDs.MMV, taxrank = "Genus")
+ps.prev.mdDs.VMV.genus <- tax_glom(ps.prev.mdDs.VMV, taxrank = "Genus")
+```
+
+```{r}
+# genera venn ----
+tiff("figures/venn.ps.prev.mdDs.MMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdDs.MMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.mdDs.VMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.mdDs.VMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+### intes only 
+## PY VS DS
+# MMV only 
+ps.prev.dsPy.MMV <- subset_samples(ps.prev, Region_Regime == "pyloric.MMV" |
+                                       Region_Regime == "distal.MMV" )
+ps.prev.dsPy.MMV <- prune_taxa(taxa_sums(ps.prev.dsPy.MMV) > 0, ps.prev.dsPy.MMV)
+
+# VMV only
+ps.prev.dsPy.VMV <- subset_samples(ps.prev, Region_Regime == "pyloric.VMV" |
+                                       Region_Regime == "distal.VMV" )
+ps.prev.dsPy.VMV <- prune_taxa(taxa_sums(ps.prev.dsPy.VMV) > 0, ps.prev.dsPy.VMV)
+```
+
+```{r}
+# ASVs venn ----
+tiff("figures/venn.ps.prev.dsPy.MMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsPy.MMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.dsPy.VMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsPy.VMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## phyla only for each subset
+ps.prev.dsPy.MMV.phylum <- tax_glom(ps.prev.dsPy.MMV, taxrank = "Phylum")
+ps.prev.dsPy.VMV.phylum <- tax_glom(ps.prev.dsPy.VMV, taxrank = "Phylum")
+```
+
+```{r}
+# phyla venn ----
+tiff("figures/venn.ps.prev.dsPy.MMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsPy.MMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.dsPy.VMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsPy.VMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## genera only for each subset
+ps.prev.dsPy.MMV.genus <- tax_glom(ps.prev.dsPy.MMV, taxrank = "Genus")
+ps.prev.dsPy.VMV.genus <- tax_glom(ps.prev.dsPy.VMV, taxrank = "Genus")
+```
+
+```{r}
+# genera venn ----
+tiff("figures/venn.ps.prev.dsPy.MMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsPy.MMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.dsPy.VMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.dsPy.VMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+# subsets ----
+## feed & water
+
+ps.prev.wtrFeed <- subset_samples(ps.prev, Region_Regime == "feed.V" |
+                                      sample == "water" )
+ps.prev.wtrFeed <- prune_taxa(taxa_sums(ps.prev.wtrFeed) > 0, ps.prev.wtrFeed)
+# MMV only 
+ps.prev.wtrFeed.MMV <- subset_samples(ps.prev, Region_Regime == "feed.V" |
+                                          Region_Regime == "water.MMV" )
+ps.prev.wtrFeed.MMV <- prune_taxa(taxa_sums(ps.prev.wtrFeed.MMV) > 0, ps.prev.wtrFeed.MMV)
+
+# VMV only
+ps.prev.wtrFeed.VMV <- subset_samples(ps.prev, Region_Regime == "feed.V" |
+                                          Region_Regime == "water.VMV" )
+ps.prev.wtrFeed.VMV <- prune_taxa(taxa_sums(ps.prev.wtrFeed.VMV) > 0, ps.prev.wtrFeed.VMV)
+
+```
+
+```{r}
+# ASVs venn ----
+tiff("figures/venn.ps.prev.wtrFeed.tiff", width = 650, height = 650)
+ps_venn(ps.prev.wtrFeed, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.wtrFeed.MMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.wtrFeed.MMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.wtrFeed.VMV.tiff", width = 650, height = 650)
+ps_venn(ps.prev.wtrFeed.VMV, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## phyla only for each subset
+ps.prev.wtrFeed.phylum <- tax_glom(ps.prev.wtrFeed, taxrank = "Phylum")
+ps.prev.wtrFeed.MMV.phylum <- tax_glom(ps.prev.wtrFeed.MMV, taxrank = "Phylum")
+ps.prev.wtrFeed.VMV.phylum <- tax_glom(ps.prev.wtrFeed.VMV, taxrank = "Phylum")
+```
+
+```{r}
+# venn ----
+tiff("figures/venn.ps.prev.wtrFeed.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.wtrFeed.phylum, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.wtrFeed.MMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.wtrFeed.MMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.wtrFeed.VMV.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.wtrFeed.VMV.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## genera only for each subset
+ps.prev.wtrFeed.genus <- tax_glom(ps.prev.wtrFeed, taxrank = "Genus")
+ps.prev.wtrFeed.MMV.genus <- tax_glom(ps.prev.wtrFeed.MMV, taxrank = "Genus")
+ps.prev.wtrFeed.VMV.genus <- tax_glom(ps.prev.wtrFeed.VMV, taxrank = "Genus")
+```
+
+```{r}
+# genera venn ----
+tiff("figures/venn.ps.prev.wtrFeed.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.wtrFeed.genus, 
+        group = "Region",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+
+tiff("figures/venn.ps.prev.wtrFeed.MMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.wtrFeed.MMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+tiff("figures/venn.ps.prev.wtrFeed.VMV.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.wtrFeed.VMV.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+```
+
+```{r}
+## feed
+ps.prev.feed <- subset_samples(ps.prev, sample == "feed")
+ps.prev.feed <- prune_taxa(taxa_sums(ps.prev.feed) > 0, ps.prev.feed)
+```
+
+```{r}
+# ASVs venn ----
+tiff("figures/venn.ps.prev.feed.tiff", width = 650, height = 650)
+ps_venn(ps.prev.feed, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+```
+
+```{r}
+## phyla only for each subset
+ps.prev.feed.phylum <- tax_glom(ps.prev.feed, taxrank = "Phylum")
+```
+
+```{r}
+# phyla venn ----
+tiff("figures/venn.ps.prev.feed.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.feed.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2, font = 5))
+dev.off()
+
+```
+
+```{r}
+## genera only for each subset
+ps.prev.feed.genus <- tax_glom(ps.prev.feed, taxrank = "Genus")
+ps.prev.prev.feed.genus.ra <- transform_sample_counts(ps.prev.feed.genus, function(ASV) ASV / sum(ASV))
+```
+
+```{r}
+# genera venn ----
+tiff("figures/venn.ps.prev.feed.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.feed.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2, font = 5))
+dev.off()
+
+```
+
+```{r}
+## water
+ps.prev.water <- subset_samples(ps.prev, sample == "water")
+ps.prev.water <- prune_taxa(taxa_sums(ps.prev.water) > 0, ps.prev.water)
+```
+
+```{r}
+## ASVs venn 
+tiff("figures/venn.ps.prev.water.tiff", width = 650, height = 650)
+ps_venn(ps.prev.water, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2.1, font = 5))
+dev.off()
+```
+
+
+```{r}
+## phyla only for each subset
+ps.prev.water.phylum <- tax_glom(ps.prev.water, taxrank = "Phylum")
+```
+
+```{r}
+## phyla venn 
+tiff("figures/venn.ps.prev.water.phylum.tiff", width = 650, height = 650)
+ps_venn(ps.prev.water.phylum, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = "counts", 
+                          cex = 2.1, font = 5))
+dev.off()
+```
+
+```{r}
+## genera only for each subset
+ps.prev.water.genus <- tax_glom(ps.prev.water, taxrank = "Genus")
+```
+
+```{r}
+## genera venn 
+tiff("figures/venn.ps.prev.water.genus.tiff", width = 650, height = 650)
+ps_venn(ps.prev.water.genus, 
+        group = "Region_Regime",
+        labels = list(cex = 1.8),
+        quantities = list(type = c("counts", "percent"), 
+                          cex = 2.1, font = 5))
+dev.off()
+```
+
+## i ran venn diagram for either of the phyla or genus level on RA (relative abundance) and it was same as original one without RA 
+# THe reason is it takes the number of phyla or genera not taking in account their abundances 
+```{r}
+sessionInfo()
+```

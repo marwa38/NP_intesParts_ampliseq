@@ -1,0 +1,118 @@
+---
+title: "STEP 12. decontam"
+author: "Marwa Tawfik"
+summary: "NP_intesParts_ampliseq"
+Platform: "R version 4.1.0 (2021-05-18) -- Camp Pontanezen; x86_64-conda-linux-gnu (64-bit)"
+date: "22 October 2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+# STEP 12. decontam
+# load libraries ----
+library(decontam); packageVersion("decontam")
+# Warning message:
+#   package decontam was built under R version 4.1.1 
+# [1] ‘1.14.0’
+```
+
+
+```{r}
+### Setting up
+# inspection to get familiar with our input data before processing 
+ps <- readRDS("phyobjects/STEP 10/ps.rds")
+sample_data(ps) # to see samples of phyloseq object
+head(sample_data(ps)) # to view only first 6 of sample_data(ps)
+sample_data(ps)$sample_or_control # to view the sample_or_control column 
+```
+
+
+```{r}
+### Inspect Library Sizes
+df <- as.data.frame(sample_data(ps)) # Put sample_data into a ggplot-friendly data.frame (ggplot accept df)
+df$LibrarySize <- sample_sums(ps)
+df <- df[order(df$LibrarySize),]
+df$Index <- seq(nrow(df))
+ggplot(data=df, aes(x=Index, y=LibrarySize, color = sample)) + geom_point()
+ggsave("figures/library_sampleVScontrol.tiff", height = 5, width = 10)
+ggplot(data=df, aes(x=Index, y=LibrarySize, color = sample_or_control)) + geom_point()
+ggsave("figures/library_sampleVScontrol1.tiff", height = 5, width = 10)
+```
+
+
+```{r}
+### Identify Contaminants - Prevalence based method 
+#  select the negative you will work with 
+sample_data(ps)$is.neg <- sample_data(ps)$sample_or_control == "negative"
+
+contamdf <- isContaminant(ps, method="prevalence", neg="is.neg")
+table(contamdf$contaminant)
+# FALSE  TRUE 
+# 6081     2
+head(which(contamdf$contaminant))
+# [1]   11 754
+
+contamdf05 <- isContaminant(ps, method="prevalence", neg="is.neg", threshold=0.5)
+table(contamdf05$contaminant)
+# FALSE  TRUE 
+# 6080     3
+
+```
+
+
+```{r}
+# Make phyloseq object of presence-absence in negative controls and true samples
+ps.pa <- transform_sample_counts(ps, function(abund) 1*(abund>0))
+ps.pa.neg <- prune_samples(sample_data(ps.pa)$is.neg, ps.pa)
+ps.pa.pos <- prune_samples(sample_data(ps.pa)$sample_or_control == "sample", ps.pa)
+```
+
+
+```{r}
+# Make data.frame of prevalence in positive and negative samples
+df.pa <- data.frame(pa.pos=taxa_sums(ps.pa.pos), pa.neg=taxa_sums(ps.pa.neg),
+                    contaminant=contamdf05$contaminant)
+ggplot(data=df.pa, aes(x=pa.neg, y=pa.pos, color=contaminant)) + geom_point() +
+  xlab("Prevalence (Negative Controls)") + ylab("Prevalence (True Samples)")
+ggsave("figures/prevalence_controls.tiff", height = 5, width = 10)
+```
+
+
+```{r}
+ps.noncontam <- prune_taxa(!contamdf05$contaminant, ps)
+ps.noncontam
+# phyloseq-class experiment-level object
+# otu_table()   OTU Table:         [ 6080 taxa and 125 samples ]
+# sample_data() Sample Data:       [ 125 samples by 11 sample variables ]
+# tax_table()   Taxonomy Table:    [ 6080 taxa by 7 taxonomic ranks ]
+
+
+# removing Methylobacterium-Methylorubrum (forgot to remove at decontam)
+filterPhyla <- "Methylobacterium-Methylorubrum"
+ps.noncontam <- subset_taxa(ps.noncontam, !Genus %in% filterPhyla)
+
+
+saveRDS(ps.noncontam, "phyobjects/ps.noncontam.rds")
+ps 
+# phyloseq-class experiment-level object
+# otu_table()   OTU Table:         [ 6083 taxa and 125 samples ]
+# sample_data() Sample Data:       [ 125 samples by 11 sample variables ]
+# tax_table()   Taxonomy Table:    [ 6083 taxa by 7 taxonomic ranks ]
+```
+
+
+```{r}
+# to check for contaminants names that was removed 
+is.contam <- contamdf05$contaminant %in% TRUE
+taxa_names(ps)[is.contam]
+tax_table(ps)[is.contam,]
+```
+
+```{r}
+sessionInfo()
+```

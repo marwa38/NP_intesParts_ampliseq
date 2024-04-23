@@ -1,0 +1,226 @@
+"Var1"	"Freq"
+"1"	"0319-6G20"	37
+"2"	"11-24"	2
+"3"	"Absconditabacteriales (SR1)"	7
+"4"	"Acetobacterales"	30
+"5"	"Acholeplasmatales"	2
+"6"	"Acidaminococcales"	9
+"7"	"Acidobacteriales"	3
+"8"	"Actinomycetales"	8
+"9"	"Aeromonadales"	24
+"10"	"Alicyclobacillales"	1
+"11"	"Alteromonadales"	48
+"12"	"Anaerolineales"	2
+"13"	"Aneurinibacillales"	3
+"14"	"Ardenticatenales"	1
+"15"	"Armatimonadales"	5
+"16"	"Azospirillales"	3
+"17"	"Babeliales"	12
+"18"	"Bacillales"	112
+"19"	"Bacteriovoracales"	9
+"20"	"Bacteroidales"	92
+"21"	"BD72BR169"	1
+"22"	"Bdellovibrionales"	36
+"23"	"Beggiatoales"	1
+"24"	"Bifidobacteriales"	13
+"25"	"Blastocatellales"	13
+"26"	"Blfdi19"	1
+"27"	"Bradymonadales"	1
+"28"	"Brevinematales"	1
+"29"	"Bryobacterales"	2
+"30"	"Burkholderiales"	433
+"31"	"Caedibacterales"	3
+"32"	"Caldicoprobacterales"	1
+"33"	"Caldilineales"	5
+"34"	"Caldisericales"	1
+"35"	"Campylobacterales"	23
+"36"	"Candidatus Adlerbacteria"	46
+"37"	"Candidatus Azambacteria"	13
+"38"	"Candidatus Beckwithbacteria"	1
+"39"	"Candidatus Brennerbacteria"	1
+"40"	"Candidatus Buchananbacteria"	1
+"41"	"Candidatus Campbellbacteria"	7
+"42"	"Candidatus Collierbacteria"	3
+"43"	"Candidatus Colwellbacteria"	2
+"44"	"Candidatus Daviesbacteria"	1
+"45"	"Candidatus Falkowbacteria"	6
+"46"	"Candidatus Giovannonibacteria"	1
+"47"	"Candidatus Jacksonbacteria"	1
+"48"	"Candidatus Jorgensenbacteria"	3
+"49"	"Candidatus Kaiserbacteria"	70
+"50"	"Candidatus Kerfeldbacteria"	8
+"51"	"Candidatus Levybacteria"	3
+"52"	"Candidatus Liptonbacteria"	7
+"53"	"Candidatus Lloydbacteria"	5
+"54"	"Candidatus Magasanikbacteria"	12
+"55"	"Candidatus Moranbacteria"	16
+"56"	"Candidatus Nomurabacteria"	180
+"57"	"Candidatus Pacebacteria"	9
+"58"	"Candidatus Peregrinibacteria"	2
+"59"	"Candidatus Peribacteria"	7
+"60"	"Candidatus Roizmanbacteria"	1
+"61"	"Candidatus Ryanbacteria"	1
+"62"	"Candidatus Staskawiczbacteria"	13
+"63"	"Candidatus Uhrbacteria"	2
+"64"	"Candidatus Vogelbacteria"	2
+"65"	"Candidatus Woesebacteria"	10
+"66"	"Candidatus Yanofskybacteria"	18
+"67"	"Candidatus Yonathbacteria"	2
+"68"	"Candidatus Zambryskibacteria"	35
+"69"	"Cardiobacteriales"	7
+"70"	"Catenulisporales"	2
+"71"	"Caulobacterales"	40
+"72"	"CCM19a"	2
+"73"	"Cellvibrionales"	14
+"74"	"CHAB-XI-27"	1
+"75"	"Chitinophagales"	69
+"76"	"Chlamydiales"	54
+"77"	"Chloracidobacteriales"	1
+"78"	"Chloroflexales"	3
+"79"	"Chloroplast"	131
+"80"	"Christensenellales"	5
+"81"	"Chthoniobacterales"	15
+"82"	"Chthonomonadales"	2
+"83"	"Clostridia UCG-014"	7
+"84"	"Clostridiales"	63
+"85"	"Coprothermobacterales"	1
+"86"	"Coriobacteriales"	14
+"87"	"Corynebacteriales"	67
+"88"	"Coxiellales"	12
+"89"	"Cyanobacteriales"	3
+"90"	"Cytophagales"	70
+"91"	"Defluviicoccales"	2
+"92"	"Deinococcales"	11
+"93"	"Desulfitobacteriales"	3
+"94"	"Desulfobacterales"	2
+"95"	"Desulfotomaculales"	1
+"96"	"Desulfovibrionales"	2
+"97"	"Dethiobacterales"	2
+"98"	"Diplorickettsiales"	32
+"99"	"Dongiales"	2
+"100"	"EC3"	1
+"101"	"Elev-16S-1166"	1
+"102"	"Elsterales"	4
+"103"	"Endomicrobiales"	2
+"104"	"Enterobacterales"	81
+"105"	"Erysipelotrichales"	27
+"106"	"Eubacteriales"	5
+"107"	"Exiguobacterales"	3
+"108"	"Ferrovibrionales"	1
+"109"	"Fibrobacterales"	6
+"110"	"Fimbriimonadales"	11
+"111"	"Flavobacteriales"	170
+"112"	"Frankiales"	23
+"113"	"Fusobacteriales"	33
+"114"	"Ga0077536"	1
+"115"	"Gaiellales"	8
+"116"	"Gammaproteobacteria Incertae Sedis"	14
+"117"	"Gastranaerophilales"	4
+"118"	"Gemmatales"	36
+"119"	"Gemmatimonadales"	20
+"120"	"GWA2-38-13b"	3
+"121"	"GWB1-42-6"	1
+"122"	"Haliangiales"	5
+"123"	"Halobacterales"	2
+"124"	"Holophagales"	2
+"125"	"Holosporales"	7
+"126"	"Hungateiclostridiaceae"	3
+"127"	"Hydrogenedentiales"	1
+"128"	"Ignavibacteriales"	1
+"129"	"IMCC26256"	11
+"130"	"Isosphaerales"	13
+"131"	"JG36-TzT-191"	1
+"132"	"JGI 0000069-P22"	3
+"133"	"Kapabacteriales"	10
+"134"	"Kineosporiales"	6
+"135"	"Ktedonobacterales"	1
+"136"	"Lachnospirales"	27
+"137"	"Lactobacillales"	242
+"138"	"Legionellales"	46
+"139"	"Leptospirales"	10
+"140"	"Lineage IV"	1
+"141"	"MBA03"	1
+"142"	"Methylococcales"	1
+"143"	"Micavibrionales"	10
+"144"	"Micrococcales"	95
+"145"	"Micromonosporales"	5
+"146"	"Micropepsales"	4
+"147"	"Microtrichales"	22
+"148"	"mle1-27"	11
+"149"	"MVP-88"	1
+"150"	"Myxococcales"	1
+"151"	"Nannocystales"	1
+"152"	"Nitrospirales"	6
+"153"	"Obscuribacterales"	8
+"154"	"Oceanospirillales"	10
+"155"	"Oligoflexales"	14
+"156"	"Omnitrophales"	9
+"157"	"Opitutales"	21
+"158"	"Oscillospirales"	44
+"159"	"Paenibacillales"	11
+"160"	"Paludibaculum"	3
+"161"	"Paracaedibacterales"	25
+"162"	"Parvibaculales"	2
+"163"	"Pasteurellales"	6
+"164"	"PB19"	1
+"165"	"Pedosphaerales"	31
+"166"	"PeM15"	8
+"167"	"Peptococcales"	3
+"168"	"Peptostreptococcales-Tissierellales"	95
+"169"	"Petrotogales"	1
+"170"	"Phycisphaerales"	11
+"171"	"Pirellulales"	32
+"172"	"Planctomycetales"	33
+"173"	"Polyangiales"	24
+"174"	"Propionibacteriales"	39
+"175"	"Pseudanabaenales"	1
+"176"	"Pseudomonadales"	144
+"177"	"Pseudonocardiales"	5
+"178"	"R7C24"	2
+"179"	"RBG-13-54-9"	3
+"180"	"Reyranellales"	16
+"181"	"RF39"	1
+"182"	"Rhizobiales"	150
+"183"	"Rhodobacterales"	39
+"184"	"Rhodospirillales"	13
+"185"	"Rhodothermales"	1
+"186"	"Rickettsiales"	528
+"187"	"Rokubacteriales"	1
+"188"	"Saccharimonadales"	214
+"189"	"Salinisphaerales"	1
+"190"	"SAR11 clade"	1
+"191"	"SBR1031"	7
+"192"	"Silvanigrellales"	4
+"193"	"SM1A07"	4
+"194"	"Solibacterales"	1
+"195"	"Solirubrobacterales"	21
+"196"	"Sphingobacteriales"	80
+"197"	"Sphingomonadales"	86
+"198"	"Spirochaetales"	6
+"199"	"Staphylococcales"	27
+"200"	"Steroidobacterales"	2
+"201"	"Streptomycetales"	3
+"202"	"Subgroup 17"	1
+"203"	"Synechococcales"	3
+"204"	"Synergistales"	7
+"205"	"Syntrophomonadales"	3
+"206"	"Tepidisphaerales"	1
+"207"	"Thermales"	2
+"208"	"Thermicanales"	1
+"209"	"Thermoactinomycetales"	3
+"210"	"Thermoanaerobacterales"	2
+"211"	"Thermomicrobiales"	7
+"212"	"Thermotogales"	4
+"213"	"Thermovenabulales"	1
+"214"	"Thiotrichales"	1
+"215"	"Tistrellales"	1
+"216"	"Vampirovibrionales"	1
+"217"	"Veillonellales-Selenomonadales"	47
+"218"	"Verrucomicrobiales"	20
+"219"	"Vibrionales"	90
+"220"	"Vicinamibacterales"	10
+"221"	"Victivallales"	1
+"222"	"WCHB1-41"	1
+"223"	"WD260"	1
+"224"	"Xanthomonadales"	45
+"225"	NA	685

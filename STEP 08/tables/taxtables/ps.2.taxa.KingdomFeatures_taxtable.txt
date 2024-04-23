@@ -1,0 +1,5 @@
+"Var1"	"Freq"
+"1"	"Archaea"	3
+"2"	"Bacteria"	5776
+"3"	"Eukaryota"	1
+"4"	NA	29

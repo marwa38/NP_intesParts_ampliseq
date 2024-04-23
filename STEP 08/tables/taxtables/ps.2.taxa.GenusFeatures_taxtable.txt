@@ -1,0 +1,644 @@
+"Var1"	"Freq"
+"1"	"[Agitococcus] lubricus group"	2
+"2"	"[Eubacterium] brachy group"	4
+"3"	"[Eubacterium] nodatum group"	1
+"4"	"1959-1"	1
+"5"	"966-1"	1
+"6"	"AAP99"	8
+"7"	"Acetitomaculum"	1
+"8"	"Acetoanaerobium"	1
+"9"	"Acetobacter"	3
+"10"	"Acetobacterium"	1
+"11"	"Acholeplasma"	2
+"12"	"Achromobacter"	4
+"13"	"Acidaminobacter"	4
+"14"	"Acidaminococcus"	2
+"15"	"Acidibacter"	2
+"16"	"Acidiphilium"	4
+"17"	"Acidipropionibacterium"	2
+"18"	"Acidisoma"	1
+"19"	"Acidovorax"	16
+"20"	"Acinetobacter"	56
+"21"	"Actinomyces"	8
+"22"	"Actinomycetospora"	1
+"23"	"ADurb.Bin063-1"	1
+"24"	"Aeriscardovia"	1
+"25"	"Aerococcus"	1
+"26"	"Aeromicrobium"	1
+"27"	"Aeromonas"	13
+"28"	"Aetherobacter"	1
+"29"	"Afipia"	7
+"30"	"Agathobacter"	1
+"31"	"Aggregicoccus"	1
+"32"	"Akkermansia"	1
+"33"	"Alcaligenes"	1
+"34"	"Alcanivorax"	1
+"35"	"Algoriphagus"	1
+"36"	"Alicyclobacillus"	1
+"37"	"Aliivibrio"	17
+"38"	"Alistipes"	2
+"39"	"Aliterella"	1
+"40"	"Alkanindiges"	3
+"41"	"Allisonella"	2
+"42"	"Alloiococcus"	1
+"43"	"Alloprevotella"	4
+"44"	"Allorhizobium-Neorhizobium-Pararhizobium-Rhizobium"	7
+"45"	"alphaI cluster"	2
+"46"	"Alsobacter"	2
+"47"	"Altererythrobacter"	1
+"48"	"Amaricoccus"	3
+"49"	"Aminobacter"	2
+"50"	"Aminobacterium"	3
+"51"	"Ammoniibacillus"	1
+"52"	"Anaerobacillus"	5
+"53"	"Anaerocella"	1
+"54"	"Anaerocolumna"	1
+"55"	"Anaerosporomusa"	1
+"56"	"Aneurinibacillus"	3
+"57"	"Angustibacter"	1
+"58"	"Anoxybacillus"	4
+"59"	"Aphanizomenon NIES81"	1
+"60"	"Aquabacterium"	3
+"61"	"Aquamicrobium"	1
+"62"	"Aquicella"	4
+"63"	"Aquipuribacter"	1
+"64"	"Aquisphaera"	4
+"65"	"Aquitalea"	2
+"66"	"Arcicella"	5
+"67"	"Arcobacter"	2
+"68"	"Arenimonas"	6
+"69"	"Aridibacter"	2
+"70"	"Armatimonas"	4
+"71"	"Arsenicibacter"	1
+"72"	"Arsenicitalea"	2
+"73"	"Arthrobacter"	4
+"74"	"Asaccharospora"	5
+"75"	"Asinibacterium"	1
+"76"	"Asticcacaulis"	2
+"77"	"Atopobium"	1
+"78"	"Atopostipes"	1
+"79"	"Aurantimicrobium"	1
+"80"	"Aurantisolimonas"	1
+"81"	"Aureimonas"	2
+"82"	"AUTHM297"	1
+"83"	"Azospira"	2
+"84"	"Bacillus"	23
+"85"	"Bacteriovorax"	2
+"86"	"Bacteroides"	17
+"87"	"Bauldia"	4
+"88"	"BD1-7 clade"	2
+"89"	"Bdellovibrio"	35
+"90"	"Beggiatoa"	1
+"91"	"Bergeyella"	1
+"92"	"Bifidobacterium"	4
+"93"	"Bizionia"	1
+"94"	"Blastocatella"	5
+"95"	"Blastococcus"	1
+"96"	"Blastopirellula"	2
+"97"	"Blautia"	2
+"98"	"Bogoriella"	1
+"99"	"Bosea"	5
+"100"	"Brachybacterium"	1
+"101"	"Brachymonas"	1
+"102"	"Bradyrhizobium"	5
+"103"	"Brevibacterium"	5
+"104"	"Brevinema"	1
+"105"	"Brevundimonas"	11
+"106"	"Breznakia"	1
+"107"	"Brochothrix"	1
+"108"	"Brucella"	1
+"109"	"Bryobacter"	2
+"110"	"BSV13"	2
+"111"	"Burkholderia-Caballeronia-Paraburkholderia"	5
+"112"	"C1-B045"	2
+"113"	"C39"	4
+"114"	"Caedibacter"	2
+"115"	"Caldanaerobacter"	1
+"116"	"Caldibacillus"	1
+"117"	"Caldicoprobacter"	1
+"118"	"Calditerricola"	3
+"119"	"Camelimonas"	1
+"120"	"Campylobacter"	1
+"121"	"Candidatus Accumulibacter"	5
+"122"	"Candidatus Alysiosphaera"	1
+"123"	"Candidatus Amoebophilus"	1
+"124"	"Candidatus Bealeia"	2
+"125"	"Candidatus Berkiella"	1
+"126"	"Candidatus Captivus"	3
+"127"	"Candidatus Cryptoprodotis"	1
+"128"	"Candidatus Endonucleariobacter"	1
+"129"	"Candidatus Finniella"	1
+"130"	"Candidatus Fritschea"	1
+"131"	"Candidatus Megaira"	3
+"132"	"Candidatus Obscuribacter"	4
+"133"	"Candidatus Odyssella"	1
+"134"	"Candidatus Omnitrophus"	8
+"135"	"Candidatus Ovatusbacter"	10
+"136"	"Candidatus Paracaedibacter"	6
+"137"	"Candidatus Photodesmus"	1
+"138"	"Candidatus Planktophila"	3
+"139"	"Candidatus Protochlamydia"	2
+"140"	"Candidatus Renichlamydia"	1
+"141"	"Candidatus Rhabdochlamydia"	3
+"142"	"Candidatus Saccharimonas"	3
+"143"	"Candidatus Solibacter"	1
+"144"	"Candidatus Trichorickettsia"	1
+"145"	"Candidatus Udaeobacter"	1
+"146"	"Candidatus Xiphinematobacter"	1
+"147"	"Caproiciproducens"	1
+"148"	"Carnimonas"	1
+"149"	"Carnobacterium"	7
+"150"	"Castellaniella"	2
+"151"	"Catenococcus"	3
+"152"	"Catenulispora"	2
+"153"	"Caulobacter"	5
+"154"	"Cellulomonas"	2
+"155"	"Cellulophaga"	1
+"156"	"Cellulosilyticum"	3
+"157"	"Cellulosimicrobium"	1
+"158"	"Cellvibrio"	4
+"159"	"Cerasibacillus"	2
+"160"	"Cereibacter"	2
+"161"	"Cetobacterium"	7
+"162"	"Chitinibacter"	1
+"163"	"Chitinimonas"	1
+"164"	"Chitinivorax"	1
+"165"	"Chitinophaga"	2
+"166"	"Chloracidobacterium"	1
+"167"	"Christensenellaceae R-7 group"	4
+"168"	"Chryseobacterium"	37
+"169"	"Chryseomicrobium"	1
+"170"	"Chthoniobacter"	6
+"171"	"Chthonomonas"	1
+"172"	"Chungangia"	3
+"173"	"Citrobacter"	6
+"174"	"CL500-29 marine group"	5
+"175"	"CL500-3"	2
+"176"	"Cloacibacillus"	2
+"177"	"Cloacibacterium"	8
+"178"	"Clostridium sensu stricto 1"	19
+"179"	"Clostridium sensu stricto 12"	6
+"180"	"Clostridium sensu stricto 13"	4
+"181"	"Clostridium sensu stricto 15"	2
+"182"	"Clostridium sensu stricto 16"	1
+"183"	"Clostridium sensu stricto 18"	1
+"184"	"Clostridium sensu stricto 19"	1
+"185"	"Clostridium sensu stricto 5"	1
+"186"	"Clostridium sensu stricto 7"	8
+"187"	"Clostridium sensu stricto 8"	1
+"188"	"Clostridium sensu stricto 9"	2
+"189"	"Comamonas"	8
+"190"	"Conexibacter"	6
+"191"	"Coprococcus"	1
+"192"	"Coprothermobacter"	1
+"193"	"Corynebacterium"	36
+"194"	"Coxiella"	12
+"195"	"Cupriavidus"	3
+"196"	"Curtobacterium"	1
+"197"	"Curvibacter"	4
+"198"	"Cutibacterium"	5
+"199"	"Cyanobium PCC-6307"	1
+"200"	"Cytophaga"	4
+"201"	"Dechloromonas"	1
+"202"	"Deefgea"	2
+"203"	"Defluviimonas"	4
+"204"	"Deinococcus"	8
+"205"	"Delftia"	3
+"206"	"Dermacoccus"	3
+"207"	"Desulfobacter"	1
+"208"	"Desulfonispora"	1
+"209"	"Desulfosporosinus"	3
+"210"	"Desulfovibrio"	1
+"211"	"Dethiobacter"	2
+"212"	"DEV008"	2
+"213"	"DEV114"	3
+"214"	"Devosia"	5
+"215"	"Dialister"	2
+"216"	"Dietzia"	3
+"217"	"Diplorickettsia"	1
+"218"	"Diplosphaera"	1
+"219"	"DMER64"	1
+"220"	"DNF00809"	1
+"221"	"Dokdonella"	4
+"222"	"Dolosigranulum"	1
+"223"	"Domibacillus"	2
+"224"	"Dongia"	2
+"225"	"Dorea"	1
+"226"	"DSSD61"	3
+"227"	"Duganella"	15
+"228"	"Dyadobacter"	5
+"229"	"Dyella"	1
+"230"	"Dysgonomonas"	5
+"231"	"Edaphobaculum"	8
+"232"	"Eikenella"	1
+"233"	"Elizabethkingia"	2
+"234"	"Ellin6067"	1
+"235"	"Empedobacter"	5
+"236"	"Emticicia"	3
+"237"	"Endomicrobium"	2
+"238"	"Enhydrobacter"	5
+"239"	"Ensifer"	1
+"240"	"Enterobacter"	9
+"241"	"Enterococcus"	18
+"242"	"Erwinia"	2
+"243"	"Erysipelothrix"	8
+"244"	"Erysipelotrichaceae UCG-003"	2
+"245"	"Erysipelotrichaceae UCG-009"	1
+"246"	"Escherichia-Shigella"	2
+"247"	"Ethanoligenens"	3
+"248"	"Eubacterium"	1
+"249"	"Exiguobacterium"	3
+"250"	"Faecalibacterium"	3
+"251"	"Falsochrobactrum"	1
+"252"	"Family XIII AD3011 group"	1
+"253"	"Fermentimonas"	1
+"254"	"Ferribacterium"	1
+"255"	"Ferruginibacter"	16
+"256"	"Fervidobacterium"	2
+"257"	"Fibrella"	1
+"258"	"Fimbriiglobus"	15
+"259"	"Fimbriimonas"	1
+"260"	"Flavisolibacter"	1
+"261"	"Flavitalea"	2
+"262"	"Flavobacterium"	85
+"263"	"Flectobacillus"	8
+"264"	"Fluviicola"	7
+"265"	"Fonticella"	2
+"266"	"Frigidibacter"	1
+"267"	"Frigoribacterium"	1
+"268"	"Fusobacterium"	18
+"269"	"Ga0074140"	2
+"270"	"Gaiella"	3
+"271"	"Galbitalea"	4
+"272"	"Garciella"	2
+"273"	"Gemella"	3
+"274"	"Gemmata"	9
+"275"	"Gemmatimonas"	11
+"276"	"Gemmobacter"	2
+"277"	"Geobacillus"	3
+"278"	"Georgenia"	1
+"279"	"Geothrix"	2
+"280"	"Gluconobacter"	1
+"281"	"Glutamicibacter"	1
+"282"	"Gordonia"	1
+"283"	"Gordonibacter"	1
+"284"	"Granulicatella"	3
+"285"	"Granulicella"	2
+"286"	"Haemophilus"	5
+"287"	"Halarcobacter"	1
+"288"	"Haliangium"	5
+"289"	"Haliscomenobacter"	1
+"290"	"Halocalculus"	2
+"291"	"Halomonas"	5
+"292"	"Hathewaya"	4
+"293"	"hgcI clade"	7
+"294"	"Hirschia"	4
+"295"	"Huanghella"	1
+"296"	"Hydrogenibacillus"	1
+"297"	"Hydrogenophaga"	7
+"298"	"Hymenobacter"	9
+"299"	"Hyphomicrobium"	24
+"300"	"Hyphomonas"	1
+"301"	"Hypnocyclicus"	1
+"302"	"Iamia"	5
+"303"	"Ideonella"	2
+"304"	"Ignatzschineria"	6
+"305"	"Ignavigranum"	1
+"306"	"Ilumatobacter"	1
+"307"	"IMCC26134"	2
+"308"	"IMCC26207"	1
+"309"	"Inquilinus"	2
+"310"	"IS-44"	1
+"311"	"Isoptericola"	1
+"312"	"Janthinobacterium"	8
+"313"	"Jatrophihabitans"	1
+"314"	"Jeotgalicoccus"	1
+"315"	"JGI 0001001-H03"	2
+"316"	"Kerstersia"	1
+"317"	"Kineococcus"	1
+"318"	"Kineosporia"	2
+"319"	"Kingella"	1
+"320"	"Klebsiella"	1
+"321"	"Klenkia"	1
+"322"	"Kluyvera"	1
+"323"	"Knoellia"	1
+"324"	"Kocuria"	11
+"325"	"Koukoulia"	1
+"326"	"Kurthia"	5
+"327"	"Kytococcus"	1
+"328"	"Labrys"	1
+"329"	"Laceyella"	2
+"330"	"Lachnoanaerobaculum"	1
+"331"	"Lachnoclostridium"	2
+"332"	"Lachnospiraceae ND3007 group"	2
+"333"	"Lachnospiraceae XPB1014 group"	1
+"334"	"Lactobacillus"	130
+"335"	"Lactococcus"	17
+"336"	"Lactovum"	3
+"337"	"Lacunisphaera"	4
+"338"	"Lampropedia"	1
+"339"	"Lapillicoccus"	1
+"340"	"Lautropia"	4
+"341"	"Lawsonella"	4
+"342"	"LD29"	2
+"343"	"Lechevalieria"	1
+"344"	"Legionella"	44
+"345"	"Lelliottia"	4
+"346"	"Leptospira"	5
+"347"	"Leptothrix"	5
+"348"	"Leptotrichia"	1
+"349"	"Leucobacter"	8
+"350"	"Leuconostoc"	11
+"351"	"Limnohabitans"	4
+"352"	"Longivirga"	3
+"353"	"Luteimonas"	1
+"354"	"Luteolibacter"	8
+"355"	"Lysinibacillus"	10
+"356"	"Lysinimonas"	1
+"357"	"Lysobacter"	3
+"358"	"Macrococcus"	1
+"359"	"Mailhella"	1
+"360"	"Malikia"	2
+"361"	"Marinagarivorans"	1
+"362"	"Marinifilum"	1
+"363"	"Marinospirillum"	1
+"364"	"Marmoricola"	5
+"365"	"Massilia"	23
+"366"	"Megasphaera"	7
+"367"	"Meiothermus"	1
+"368"	"Mesoflavibacter"	1
+"369"	"Mesorhizobium"	8
+"370"	"Methylibium"	3
+"371"	"Methylotenera"	5
+"372"	"Methyloversatilis"	1
+"373"	"Microbacterium"	7
+"374"	"Micrococcus"	3
+"375"	"Microlunatus"	1
+"376"	"Micromonospora"	3
+"377"	"Microvirga"	1
+"378"	"Microvirgula"	2
+"379"	"Minicystis"	2
+"380"	"mle1-7"	1
+"381"	"MM1"	2
+"382"	"MND1"	2
+"383"	"Mobilitalea"	1
+"384"	"Moraxella"	3
+"385"	"Morganella"	4
+"386"	"Moritella"	11
+"387"	"Mucilaginibacter"	2
+"388"	"Mycetocola"	1
+"389"	"Mycobacterium"	14
+"390"	"Myroides"	8
+"391"	"Nakamurella"	3
+"392"	"Nannocystis"	1
+"393"	"Neisseria"	2
+"394"	"Neochlamydia"	14
+"395"	"Nesterenkonia"	2
+"396"	"Nguyenibacter"	1
+"397"	"Nitrosomonas"	6
+"398"	"Nitrosospira"	2
+"399"	"Nitrospira"	6
+"400"	"Niveibacterium"	1
+"401"	"NK4A214 group"	1
+"402"	"Nocardia"	1
+"403"	"Nocardioides"	20
+"404"	"Nordella"	2
+"405"	"Nosocomiicoccus"	1
+"406"	"Novibacillus"	1
+"407"	"Noviherbaspirillum"	2
+"408"	"Novosphingobium"	22
+"409"	"NS10 marine group"	1
+"410"	"Oblitimonas"	1
+"411"	"oc32"	4
+"412"	"Oceanisphaera"	1
+"413"	"Oceanobacillus"	1
+"414"	"Ochrobactrum"	3
+"415"	"OLB12"	2
+"416"	"Olsenella"	5
+"417"	"OM27 clade"	1
+"418"	"OM60(NOR5) clade"	4
+"419"	"Opitutus"	10
+"420"	"Oribacterium"	1
+"421"	"Ornithinimicrobium"	2
+"422"	"Oscillibacter"	1
+"423"	"Paenalcaligenes"	1
+"424"	"Paenibacillus"	8
+"425"	"Paeniclostridium"	2
+"426"	"Paeniglutamicibacter"	2
+"427"	"Paenirhodobacter"	2
+"428"	"Pajaroellobacter"	9
+"429"	"Paludibacter"	12
+"430"	"Paludibacterium"	2
+"431"	"Pantoea"	6
+"432"	"Parablastomonas"	1
+"433"	"Paraclostridium"	4
+"434"	"Paracoccus"	5
+"435"	"Parasediminibacterium"	1
+"436"	"Parvibaculum"	1
+"437"	"Paucibacter"	11
+"438"	"Pectinatus"	3
+"439"	"Pediococcus"	7
+"440"	"Pedobacter"	24
+"441"	"Pedomicrobium"	4
+"442"	"Pelomonas"	5
+"443"	"Pelosinus"	4
+"444"	"Peptococcus"	2
+"445"	"Peptostreptococcus"	5
+"446"	"Peredibacter"	5
+"447"	"Phascolarctobacterium"	2
+"448"	"Phaselicystis"	6
+"449"	"Phenylobacterium"	5
+"450"	"Photobacterium"	46
+"451"	"Phreatobacter"	9
+"452"	"Phycicoccus"	1
+"453"	"Pir4 lineage"	6
+"454"	"Pirellula"	7
+"455"	"Piscinibacter"	2
+"456"	"Planctopirus"	2
+"457"	"Planktomarina"	1
+"458"	"Planococcus"	1
+"459"	"pLW-20"	1
+"460"	"Polaromonas"	9
+"461"	"Polymorphobacter"	2
+"462"	"Polynucleobacter"	4
+"463"	"Porphyromonas"	2
+"464"	"possible genus 04"	1
+"465"	"possible genus 06"	1
+"466"	"Prevotella"	15
+"467"	"Propionibacterium"	2
+"468"	"Propionicicella"	2
+"469"	"Propionigenium"	1
+"470"	"Propionispira"	1
+"471"	"Prosthecobacter"	5
+"472"	"Proteiniborus"	1
+"473"	"Proteiniclasticum"	4
+"474"	"Proteiniphilum"	2
+"475"	"Proteocatella"	1
+"476"	"Proteus"	7
+"477"	"Providencia"	4
+"478"	"Pseudanabaena PCC-7429"	1
+"479"	"Pseudarcicella"	1
+"480"	"Pseudarcobacter"	8
+"481"	"Pseudarthrobacter"	3
+"482"	"Pseudoalteromonas"	2
+"483"	"Pseudochelatococcus"	1
+"484"	"Pseudochrobactrum"	2
+"485"	"Pseudoclavibacter"	1
+"486"	"Pseudoflavitalea"	1
+"487"	"Pseudoglutamicibacter"	1
+"488"	"Pseudogracilibacillus"	4
+"489"	"Pseudolabrys"	3
+"490"	"Pseudomonas"	57
+"491"	"Pseudonocardia"	3
+"492"	"Pseudoramibacter"	1
+"493"	"Pseudorhodobacter"	8
+"494"	"Pseudorhodoplanes"	1
+"495"	"Pseudoxanthomonas"	3
+"496"	"Psychrilyobacter"	2
+"497"	"Psychrobacter"	14
+"498"	"Psychromonas"	6
+"499"	"Pyramidobacter"	2
+"500"	"Qipengyuania"	2
+"501"	"Quadrisphaera"	1
+"502"	"Rahnella1"	5
+"503"	"Ralstonia"	1
+"504"	"Raoultella"	4
+"505"	"Rathayibacter"	1
+"506"	"Reyranella"	14
+"507"	"Rhabdobacter"	1
+"508"	"Rheinheimera"	2
+"509"	"Rhizobacter"	21
+"510"	"Rhizorhapis"	7
+"511"	"Rhodanobacter"	3
+"512"	"Rhodobacter"	4
+"513"	"Rhodococcus"	2
+"514"	"Rhodoferax"	32
+"515"	"Rhodoligotrophos"	1
+"516"	"Rhodoluna"	2
+"517"	"Rhodopila"	1
+"518"	"Rhodoplanes"	1
+"519"	"Rhodopseudomonas"	2
+"520"	"Rhodovarius"	1
+"521"	"Rhodovastum"	7
+"522"	"Rickettsiella"	7
+"523"	"Rikenellaceae RC9 gut group"	2
+"524"	"Rivicola"	3
+"525"	"Romboutsia"	3
+"526"	"Roseateles"	2
+"527"	"Roseimarinus"	3
+"528"	"Roseococcus"	1
+"529"	"Roseomonas"	4
+"530"	"Rothia"	4
+"531"	"Rubrivivax"	3
+"532"	"Rudanella"	4
+"533"	"Rugamonas"	5
+"534"	"Runella"	1
+"535"	"Salinibacterium"	1
+"536"	"Salinispora"	1
+"537"	"Samsonia"	1
+"538"	"Sandaracinus"	1
+"539"	"Sanguibacter"	2
+"540"	"Sarcina"	1
+"541"	"Savagea"	6
+"542"	"Scardovia"	1
+"543"	"Schlesneria"	7
+"544"	"Scytonema UTEX 2349"	1
+"545"	"Sediminibacterium"	5
+"546"	"Selenomonas"	4
+"547"	"Seohaeicola"	1
+"548"	"Serratia"	7
+"549"	"SH-PL14"	5
+"550"	"SH3-11"	6
+"551"	"Shewanella"	27
+"552"	"Shinella"	4
+"553"	"Silvanigrella"	2
+"554"	"Simplicispira"	9
+"555"	"Singulisphaera"	1
+"556"	"Sinibacillus"	1
+"557"	"SM1A02"	9
+"558"	"SN8"	2
+"559"	"Snodgrassella"	2
+"560"	"Sodalis"	1
+"561"	"Solitalea"	4
+"562"	"Solobacterium"	4
+"563"	"Soonwooa"	3
+"564"	"Sphaerochaeta"	3
+"565"	"Sphaerotilus"	13
+"566"	"Sphingoaurantiacus"	1
+"567"	"Sphingobacterium"	7
+"568"	"Sphingobium"	6
+"569"	"Sphingomonas"	26
+"570"	"Sphingopyxis"	3
+"571"	"Sphingorhabdus"	7
+"572"	"Spirochaeta 2"	1
+"573"	"Spirosoma"	2
+"574"	"Sporichthya"	2
+"575"	"Sporosarcina"	4
+"576"	"Staphylococcus"	21
+"577"	"Stella"	1
+"578"	"Stenotrophobacter"	4
+"579"	"Stenotrophomonas"	16
+"580"	"Sterolibacterium"	1
+"581"	"Streptococcus"	16
+"582"	"Streptomyces"	3
+"583"	"Subdoligranulum"	1
+"584"	"Succiniclasticum"	1
+"585"	"Succinispira"	2
+"586"	"Sulfurimonas"	2
+"587"	"Sulfuritalea"	5
+"588"	"Sulfurospirillum"	3
+"589"	"Sutterella"	5
+"590"	"Sva0996 marine group"	1
+"591"	"SWB02"	8
+"592"	"Synechococcus CC9902"	2
+"593"	"Syntrophomonas"	2
+"594"	"Tabrizicola"	2
+"595"	"Tahibacter"	2
+"596"	"Taibaiella"	1
+"597"	"Tepidimonas"	1
+"598"	"Tepidiphilus"	4
+"599"	"Terrabacter"	1
+"600"	"Terrimicrobium"	2
+"601"	"Terrimonas"	5
+"602"	"Thermoanaerobacterium"	1
+"603"	"Thermobacillus"	1
+"604"	"Thermobrachium"	2
+"605"	"Thermomonas"	4
+"606"	"Thermosipho"	1
+"607"	"Thermosyntropha"	1
+"608"	"Thermotoga"	1
+"609"	"Thermus"	1
+"610"	"Thiothrix"	1
+"611"	"TM7a"	42
+"612"	"Tolumonas"	3
+"613"	"Treponema"	1
+"614"	"Truepera"	2
+"615"	"Tundrisphaera"	4
+"616"	"Turicella"	2
+"617"	"Turneriella"	4
+"618"	"UBA1819"	1
+"619"	"UCG-004"	1
+"620"	"UCG-005"	3
+"621"	"UKL13-1"	3
+"622"	"Uliginosibacterium"	1
+"623"	"Undibacterium"	9
+"624"	"Ureibacillus"	3
+"625"	"Vagococcus"	11
+"626"	"Variibacter"	1
+"627"	"Variovorax"	7
+"628"	"Veillonella"	9
+"629"	"Verrucosispora"	1
+"630"	"Verticiella"	1
+"631"	"Vibrio"	23
+"632"	"Vogesella"	5
+"633"	"WCHB1-32"	3
+"634"	"Weissella"	6
+"635"	"Williamsia"	1
+"636"	"Woeseia"	1
+"637"	"Xanthobacter"	1
+"638"	"XBB1006"	1
+"639"	"Xylophilus"	1
+"640"	"Yersinia"	1
+"641"	"Zoogloea"	8
+"642"	"ZOR0006"	1
+"643"	NA	2950

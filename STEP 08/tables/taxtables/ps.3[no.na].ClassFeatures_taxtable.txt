@@ -1,0 +1,16 @@
+"Var1"	"Freq"
+"1"	"Actinobacteria"	53
+"2"	"Alphaproteobacteria"	29
+"3"	"Bacilli"	85
+"4"	"Bacteroidia"	40
+"5"	"Campylobacteria"	7
+"6"	"Clostridia"	20
+"7"	"Deinococci"	1
+"8"	"Desulfobacteria"	1
+"9"	"Fusobacteriia"	2
+"10"	"Gammaproteobacteria"	135
+"11"	"Negativicutes"	8
+"12"	"Nitrospiria"	1
+"13"	"Synergistia"	3
+"14"	"Thermoanaerobacteria"	1
+"15"	"Thermotogae"	2

@@ -1,0 +1,36 @@
+"Var1"	"Freq"
+"1"	"Acidobacteriota"	41
+"2"	"Actinobacteriota"	361
+"3"	"Armatimonadota"	18
+"4"	"Bacteroidota"	501
+"5"	"Bdellovibrionota"	100
+"6"	"Caldisericota"	1
+"7"	"Campilobacterota"	23
+"8"	"Chloroflexi"	39
+"9"	"Coprothermobacterota"	1
+"10"	"Cyanobacteria"	158
+"11"	"Deinococcota"	13
+"12"	"Dependentiae"	12
+"13"	"Desulfobacterota"	10
+"14"	"Elusimicrobiota"	9
+"15"	"Fibrobacterota"	6
+"16"	"Firmicutes"	761
+"17"	"Fusobacteriota"	33
+"18"	"Gemmatimonadota"	20
+"19"	"Halobacterota"	2
+"20"	"Hydrogenedentes"	1
+"21"	"Margulisbacteria"	2
+"22"	"MBNT15"	6
+"23"	"Methylomirabilota"	1
+"24"	"Myxococcota"	43
+"25"	"Nitrospirota"	6
+"26"	"Patescibacteria"	888
+"27"	"Planctomycetota"	135
+"28"	"Proteobacteria"	2114
+"29"	"SAR324 clade(Marine group B)"	7
+"30"	"Spirochaetota"	18
+"31"	"Synergistota"	7
+"32"	"Thermotogota"	5
+"33"	"Verrucomicrobiota"	153
+"34"	"WPS-2"	7
+"35"	NA	307

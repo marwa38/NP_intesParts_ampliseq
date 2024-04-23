@@ -1,0 +1,25 @@
+"Var1"	"Freq"
+"1"	"Acidobacteriota"	26
+"2"	"Actinobacteriota"	318
+"3"	"Armatimonadota"	16
+"4"	"Bacteroidota"	473
+"5"	"Bdellovibrionota"	53
+"6"	"Campilobacterota"	21
+"7"	"Chloroflexi"	26
+"8"	"Deinococcota"	13
+"9"	"Dependentiae"	6
+"10"	"Desulfobacterota"	4
+"11"	"Elusimicrobiota"	2
+"12"	"Fibrobacterota"	6
+"13"	"Firmicutes"	719
+"14"	"Fusobacteriota"	33
+"15"	"Gemmatimonadota"	20
+"16"	"Myxococcota"	31
+"17"	"Nitrospirota"	6
+"18"	"Patescibacteria"	94
+"19"	"Planctomycetota"	110
+"20"	"Proteobacteria"	1453
+"21"	"Spirochaetota"	17
+"22"	"Synergistota"	7
+"23"	"Thermotogota"	5
+"24"	"Verrucomicrobiota"	146

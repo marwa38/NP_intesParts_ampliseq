@@ -1,0 +1,12 @@
+"Var1"	"Freq"
+"1"	"Actinobacteriota"	53
+"2"	"Bacteroidota"	40
+"3"	"Campilobacterota"	7
+"4"	"Deinococcota"	1
+"5"	"Desulfobacterota"	1
+"6"	"Firmicutes"	114
+"7"	"Fusobacteriota"	2
+"8"	"Nitrospirota"	1
+"9"	"Proteobacteria"	164
+"10"	"Synergistota"	3
+"11"	"Thermotogota"	2
